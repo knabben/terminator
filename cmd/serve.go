@@ -16,7 +16,9 @@ package cmd
 
 import (
 	"fmt"
+	restful "github.com/emicklei/go-restful"
 	"github.com/spf13/cobra"
+	"log"
 	"net/http"
 )
 
@@ -26,8 +28,8 @@ var serveCmd = &cobra.Command{
 	Long: `The API provides a connection with the Kubernetes cluster and
     is responsible to start the requests`,
 	Run: func(cmd *cobra.Command, args []string) {
-		http.Handle("/", test)
-		fmt.Println("serve called")
+		restful.Add(CreateHTTPAPIHandler())
+		log.Fatal(http.ListenAndServe(":8082", nil))
 	},
 }
 
