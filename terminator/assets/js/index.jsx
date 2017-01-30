@@ -1,7 +1,12 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import App from './app'
+import { Router, Route, hashHistory } from 'react-router'
+
+import Main from './component/main'
 
 ReactDOM.render(
-    <App/>, document.getElementById('react-app')
+    <Router history={hashHistory}>
+        <Route path="/" component={Main}/>
+    </Router>
+    ,document.getElementById('react-app')
 )

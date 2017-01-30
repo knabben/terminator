@@ -18,6 +18,5 @@ class ListItem(APIView):
             release = fetch_list_release()
             data = protobuf_to_model(release)
         except Exception as e:
-            print(e)
             data = []
         return Response({"releases": data})
