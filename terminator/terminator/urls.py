@@ -8,7 +8,7 @@ urlpatterns = [
     url('^$', views.IndexView.as_view()),
 
     # APIs
-    url('items/', views.ListItem.as_view()),
+    url('items/', views.ListItem.as_view(), name="items"),
 
     url('^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     url(r'^admin/', admin.site.urls),

@@ -38,15 +38,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'webpack_loader',
-    'rest_framework'
-]
+    'rest_framework',
 
-REST_FRAMEWORK = {
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAdminUser',
-    ],
-    'PAGE_SIZE': 10
-}
+    'proxy'
+]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -138,3 +133,8 @@ WEBPACK_LOADER = {
         'STATS_FILE': os.path.join(BASE_DIR, 'webpack-stats.json'),
     }
 }
+
+# HELM fetch GRPC connection via Kubernetes pod PortForward,
+# you can achieve it by:
+# $ kubectl port-forward tiller-pod --namespace=kube-system :44134
+TILLER_HOST = "localhost:44134"
