@@ -19,4 +19,5 @@ class ListItem(APIView):
             data = protobuf_to_model(release)
         except Exception as e:
             data = []
+
         return Response({"releases": data})

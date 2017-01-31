@@ -8,11 +8,23 @@
       <script src="https://code.jquery.com/jquery-3.1.1.slim.min.js"></script>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js"></script>
       <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js"></script>
+      <style>
+          .container {
+              margin-top: 4em;
+          }
+      </style>
   </head>
     <body>
         <nav class="navbar navbar-toggleable-md navbar-inverse fixed-top bg-inverse">
+            <a class="navbar-brand" href="#">terminator</a>
         </nav>
-      <div id="react-app"></div>
-      {% render_bundle 'main' %}
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <div id="react-app"></div>
+                </div>
+            </div>
+        </div>
     </body>
+    {% render_bundle 'main' %}
 </html>

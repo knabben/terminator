@@ -1,21 +1,21 @@
 import grpc
 
-from hapi.services import tiller_pb2_grpc, tiller_pb2
-
 from collections import defaultdict
+from datetime import datetime
+
+from django.conf import settings
 from proxy.models import Release
 
-from datetime import datetime
+from hapi.services import tiller_pb2_grpc, tiller_pb2
 
 
 def get_tiller_settings():
-    from django.conf import settings
     return settings.TILLER_HOST
 
 def fetch_list_release():
     channel = grpc.insecure_channel(get_tiller_settings())
     stub = tiller_pb2_grpc.ReleaseServiceStub(channel)
-    response = stub.ListReleases( tiller_pb2.ListReleasesRequest())
+    response = stub.ListReleases(tiller_pb2.ListReleasesRequest())
     return response.next()
 
 def extract_attributes(releases, attrs):
@@ -45,8 +45,6 @@ def extract_attributes(releases, attrs):
 
 def protobuf_to_model(protobuf):
     """ Move ProtoBuffer to models """
-    # TODO - Mock protobuf responses to create test
-    #assert type(protobuf) == tiller_pb2.ListReleasesResponse
     attrs = [
         ("info.first_deployed.seconds", "first_deploy",
          lambda x: datetime.fromtimestamp(float(x))),
