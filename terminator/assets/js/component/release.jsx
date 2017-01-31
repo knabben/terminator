@@ -3,10 +3,13 @@ import React from 'react'
 class Release extends React.Component {
     render() {
         return (
-            <div>
-                {this.props.name} {this.props.namespace}
-                <button onClick={this.props.onDelete}>x</button>
-            </div>
+            <tr>
+                <td>{this.props.name}</td>
+                <td>{this.props.version}</td>
+                <td>{this.props.namespace}</td>
+                <td>{this.props.last_deploy}</td>
+                <td><button className="btn" onClick={this.props.onDelete}>x</button></td>
+            </tr>
         )
     }
 }

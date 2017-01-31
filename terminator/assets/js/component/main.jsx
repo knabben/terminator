@@ -4,7 +4,6 @@ import axios from 'axios'
 import uuid from 'uuid'
 
 import Release from './release'
-import ListItem from './list'
 
 
 class Main extends React.Component {
@@ -16,7 +15,6 @@ class Main extends React.Component {
 
         // Fetch items list
         axios.get('/items/').then( (response) => {
-            console.log(response.data.releases)
             this.setState({releases: response.data.releases})
         })
     };
@@ -29,7 +27,6 @@ class Main extends React.Component {
         axios.delete('/items/').then( (response) => {
             console.log(response)
         })
-
         this.setState({
             releases: this.state.releases.filter(
                 release => release.name !== name
@@ -41,13 +38,28 @@ class Main extends React.Component {
         const releases = this.state.releases;
         return (
             <div className="row">
-                <div className="col-12">{
-                releases.map( ({name, namespace}) =>
-                    <Release key={uuid.v4()}
-                        name={name}
-                        namespace={namespace}
-                        onDelete={() => this.onDelete(name)}/>
-                )}
+                <div className="col-12">
+                    <table className="table table-stripped">
+                        <thead className="thead-inverse">
+                        <tr>
+                            <td>Name</td>
+                            <td>Version</td>
+                            <td>Namespace</td>
+                            <td>LastDeploy</td>
+                            <td>Delete</td>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {releases.map(({name, namespace, version, last_deploy}) =>
+                            <Release key={uuid.v4()}
+                                name={name}
+                                namespace={namespace}
+                                last_deploy={last_deploy}
+                                version={version}
+                                onDelete={() => this.onDelete(name)}/>
+                        )}
+                        </tbody>
+                    </table>
                 </div>
             </div>
         )
