@@ -1,13 +1,14 @@
 {% load render_bundle from webpack_loader %}
+{% load static %}
 <!DOCTYPE html>
 <html>
   <head>
       <meta charset="UTF-8">
       <title>Example</title>
-      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" />
-      <script src="https://code.jquery.com/jquery-3.1.1.slim.min.js"></script>
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js"></script>
-      <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js"></script>
+      <link rel="stylesheet" href="{% static "global/css/bootstrap.min.css" %}"/>
+      <script src="{% static "global/jquery-3.1.1.slim.min.js" %}"></script>
+      <script src="{% static "global/tether.min.js" %}"></script>
+      <script src="{% static "global/bootstrap.min.js" %}"></script>
       <style>
           .container {
               margin-top: 4em;
@@ -21,7 +22,7 @@
         <div class="container">
             <div class="row">
                 <div class="col-md-12">
-                    <div id="react-app"></div>
+                    <div id="app"></div>
                 </div>
             </div>
         </div>

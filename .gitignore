@@ -4,3 +4,5 @@ db.sqlite3
 # JavaScript
 bundles
 node_modules
+
+webpack-stats.json
