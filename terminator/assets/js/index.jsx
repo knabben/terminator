@@ -1,12 +1,19 @@
 import React from 'react'
-import ReactDOM from 'react-dom'
-import { Router, Route, hashHistory } from 'react-router'
 
-import Main from './component/main'
+import { render } from 'react-dom'
 
-ReactDOM.render(
-    <Router history={hashHistory}>
-        <Route path="/" component={Main}/>
-    </Router>
-    ,document.getElementById('react-app')
+import { Provider } from 'react-redux'
+import { createStore } from 'redux'
+
+import reducerFilter from './reducers/index'
+
+import App from './component/App'
+
+let store = createStore(reducerFilter)
+
+render(
+  <Provider store={store}>
+    <App />
+  </Provider>,
+  document.getElementById('app')
 )
