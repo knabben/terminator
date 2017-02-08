@@ -3,13 +3,11 @@ import React from 'react'
 import { render } from 'react-dom'
 
 import { Provider } from 'react-redux'
-import { createStore } from 'redux'
-
-import reducerFilter from './reducers/index'
+import configureStore from './store/configureStore'
 
 import App from './component/App'
 
-let store = createStore(reducerFilter)
+let store = configureStore()
 
 render(
   <Provider store={store}>
