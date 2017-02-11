@@ -1,19 +1,10 @@
-const release = (state, action) => {
-  switch(action.type) {
-    case 'ADD_RELEASE':
-      return action.release;
-    default:
-      return state
-  }
-}
+import { RECEIVE_RELEASE } from '../actions/'
 
+// Reducer for RELEASES
 const releases = (state = [], action) => {
   switch(action.type) {
-    case 'ADD_RELEASE':
-      return [
-        ...state,
-        release(undefined, action)
-      ]
+    case RECEIVE_RELEASE:
+      return action.data
     default:
       return state
   }

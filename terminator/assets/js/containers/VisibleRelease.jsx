@@ -1,25 +1,11 @@
 import { connect } from 'react-redux'
 import ReleaseList from '../component/ReleaseList'
+import { RECEIVE_RELEASE } from '../actions/'
 
-const getVisibleRelease = (releases, filter) => {
-  switch (filter) {
-    case 'SHOW_ALL':
-      return releases
-    case 'SHOW_NAMESPACE':
-      return (
-        releases.filter(r => r.namespace == 'monitoring')
-      )
-    default:
-      throw new Error("Unknown filter:" + filter)
-  }
-}
 
 const mapStateToProps = (state) => ({
-  releases: getVisibleRelease(state.releases, state.visibilityFilter)
+  releases: state.releases
 })
-
-const VisibleReleaseList = connect(
-  mapStateToProps
-)(ReleaseList)
+const VisibleReleaseList = connect(mapStateToProps)(ReleaseList)
 
 export default VisibleReleaseList

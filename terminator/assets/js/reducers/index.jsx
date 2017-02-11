@@ -1,10 +1,6 @@
 import { combineReducers } from 'redux'
-import visibilityFilter from './visibilityFilter'
 import releases from './releases'
 
-const reducerFilter = combineReducers({
-  releases,
-  visibilityFilter
-})
+const reducerFilter = combineReducers({releases})
 
 export default reducerFilter
