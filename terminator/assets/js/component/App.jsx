@@ -9,7 +9,6 @@ import FetchRelease from '../containers/FetchRelease'
 
 const App = () => (
   <div>
-    <FetchRelease />
     <VisibleReleaseList />
     <Footer />
   </div>

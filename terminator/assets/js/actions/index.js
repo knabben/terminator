@@ -19,7 +19,7 @@ function receiveRelease(data) {
 }
 
 export function fetchReleases() {
-  // Fetch release async main function
+  // Fetch HELM releases async
   return dispatch => {
     return fetch("/items/").then(response => response.json())
       .then(data => dispatch(receiveRelease(data.releases)))
