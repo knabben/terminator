@@ -26,12 +26,16 @@ function deleteRelease(releaseId) {
   };
 }
 
-
-export const delRelease = releaseId => (dispatch, getState) => {
-    dispatch(deleteReleaseId(releaseId));
+// Delete HELM release
+export const delRelease = releaseName => (dispatch) => {
+    dispatch(requestRelease());
+    return fetch(
+        `/items/?release_name=${releaseName}`,
+        {method: "DELETE"})
+        .then(response => dispatch(fetchReleases()));
 };
 
-// Fetch HELM releases async
+// Fetch HELM release async
 export const fetchReleases = () => dispatch => {
     dispatch(requestRelease());
     return fetch("/items/")

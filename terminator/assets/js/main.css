@@ -141,3 +141,8 @@ nav {
     margin-top: 2em;
     font-size: 14px;
 }
+
+.btn-del {
+  margin-left: 20px;
+  font-size: 10px;
+}

@@ -1,12 +1,22 @@
 import React, { PropTypes } from 'react'
 import uuid from 'uuid'
 
+import { delRelease } from '../actions/'
 import Release from './Release'
 
-
 class ReleaseList extends React.Component {
+
+    constructor() {
+      super()
+      this.deleteRelease = this.deleteRelease.bind(this);
+    }
+  
+    deleteRelease(releaseName) {
+      this.props.dispatch(delRelease(releaseName));
+    }
+
     render() {
-        const { isFetching, data } = this.props
+        const { isFetching, data, dispatch } = this.props
         return (
             <div>
               {isFetching &&
@@ -22,7 +32,9 @@ class ReleaseList extends React.Component {
                         name={name}
                         namespace={namespace}
                         last_deploy={last_deploy}
-                        version={version} />
+                        version={version}
+                        onDelete={ () => this.deleteRelease(name) }
+                        />
                     )}
                 </div>
               }

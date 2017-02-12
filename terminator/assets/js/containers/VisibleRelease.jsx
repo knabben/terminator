@@ -1,4 +1,5 @@
 import { connect } from 'react-redux'
+
 import ReleaseList from '../component/ReleaseList'
 import { RECEIVE_RELEASE } from '../actions/'
 
@@ -10,6 +11,8 @@ function mapStateToProps(state) {
     }
 }
 
-const VisibleReleaseList = connect(mapStateToProps)(ReleaseList)
+const VisibleReleaseList = connect(
+  mapStateToProps
+)(ReleaseList)
 
 export default VisibleReleaseList
