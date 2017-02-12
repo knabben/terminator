@@ -1,12 +1,13 @@
+require('./main.css');
+
 import React from 'react'
 
-import { render } from 'react-dom'
-
-import { Provider } from 'react-redux'
+import App from './component/App'
 import DevTools from './containers/DevTools'
 import configureStore from './store/configureStore'
 
-import App from './component/App'
+import { render } from 'react-dom'
+import { Provider } from 'react-redux'
 import { fetchReleases } from './actions/'
 
 

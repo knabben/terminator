@@ -5,12 +5,16 @@ import React from 'react'
 class Release extends React.Component {
     render() {
       return (
-        <tr>
-          <td>{this.props.name}</td>
-          <td>{this.props.version}</td>
-          <td>{this.props.namespace}</td>
-          <td>{this.props.last_deploy}</td>
-        </tr>
+        <div className="app-item">
+          <div className="row">
+            <div className="col-6 text-left">
+              <span> {this.props.name} </span>
+            </div>
+            <div className="col-6">
+              <div className="right-border text-right">version {this.props.version} </div>
+            </div>
+          </div>
+        </div>
       )
     }
 }

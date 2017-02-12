@@ -38,5 +38,3 @@ export const fetchReleases = () => dispatch => {
         .then(response => response.json())
         .then(data => dispatch(receiveRelease(data.releases)));
 };
-
-

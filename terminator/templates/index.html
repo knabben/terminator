@@ -9,23 +9,22 @@
       <script src="{% static "global/jquery-3.1.1.slim.min.js" %}"></script>
       <script src="{% static "global/tether.min.js" %}"></script>
       <script src="{% static "global/bootstrap.min.js" %}"></script>
-      <style>
-          .container {
-              margin-top: 4em;
-          }
-      </style>
   </head>
     <body>
-        <nav class="navbar navbar-toggleable-md navbar-inverse fixed-top bg-inverse">
-            <a class="navbar-brand" href="#">terminator</a>
+        <nav class="navbar">
+            <a class="navbar-brand text-left" href="#">terminator</a>
+            <div class="glowbar"></div>
         </nav>
-        <div class="container">
+        <div class="main-panel">
             <div class="row">
-                <div class="col-md-12">
-                    <div id="app"></div>
+                <div class="col-md-12 border">
+                    <div class="top-nav">
+                    HELM charts 
+                    </div>
                 </div>
             </div>
         </div>
+        <div id="app"></div>
     </body>
     {% render_bundle 'main' %}
 </html>
