@@ -12,7 +12,17 @@ from hapi.services import tiller_pb2_grpc, tiller_pb2
 def get_tiller_settings():
     return settings.TILLER_HOST
 
+def delete_release(release_name):
+    """ Delete the specified release via GRPC """
+    channel = grpc.insecure_channel(get_tiller_settings())
+    stub = tiller_pb2_grpc.ReleaseServiceStub(channel)
+    response = stub.UninstallRelease(tiller_pb2.UninstallReleaseRequest(
+        name=release_name, purge=True
+    ))
+    return response
+
 def fetch_list_release():
+    """" List all releases via GRPC """
     channel = grpc.insecure_channel(get_tiller_settings())
     stub = tiller_pb2_grpc.ReleaseServiceStub(channel)
     response = stub.ListReleases(tiller_pb2.ListReleasesRequest())
