@@ -1,16 +1,20 @@
 import React, { PropTypes } from 'react'
 import uuid from 'uuid'
 
-import { delRelease } from '../actions/'
+import { delRelease, fetchReleases } from '../actions/'
 import Release from './Release'
 
 class ReleaseList extends React.Component {
-
     constructor() {
       super()
       this.deleteRelease = this.deleteRelease.bind(this);
     }
-  
+
+    componentWillMount() {
+        const { dispatch } = this.props
+        dispatch(fetchReleases())
+    } 
+
     deleteRelease(releaseName) {
       this.props.dispatch(delRelease(releaseName));
     }

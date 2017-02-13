@@ -11,7 +11,7 @@ class Release extends React.Component {
             <span> {this.props.name} </span>
           </div>
           <div className="col-6">
-            <div className="right-border text-left">
+            <div className="right-border text-right">
               version {this.props.version} | namespace {this.props.namespace}
             <button className="btn btn-danger btn-sm btn-del" onClick={this.props.onDelete}>x</button></div>
           </div>

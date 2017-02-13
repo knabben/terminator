@@ -2,25 +2,17 @@ require('./main.css');
 
 import React from 'react'
 
-import App from './component/App'
-import DevTools from './containers/DevTools'
+import { browserHistory } from 'react-router'
+import { syncHistoryWithStore } from 'react-router-redux'
 import configureStore from './store/configureStore'
 
+import Root from './component/Root'
 import { render } from 'react-dom'
-import { Provider } from 'react-redux'
-import { fetchReleases } from './actions/'
 
-
-let store = configureStore()
+const store = configureStore()
+const history = syncHistoryWithStore(browserHistory, store)
 
 render(
-  <Provider store={store}>
-    <div>
-      <App />
-      <DevTools />
-    </div>
-  </Provider>,
+  <Root store={store} history={history} />,
   document.getElementById('app')
 )
-
-store.dispatch(fetchReleases())

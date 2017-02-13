@@ -143,6 +143,9 @@ nav {
 }
 
 .btn-del {
-  margin-left: 20px;
+  margin-left: 40px;
   font-size: 10px;
+}
+.create-label {
+    display: inline
 }
