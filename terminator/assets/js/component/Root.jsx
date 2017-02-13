@@ -18,6 +18,7 @@ const Root = ({ store, history }) => (
         <Route path="/" component={App} />
         <Route path="/create" component={CreatePage} />
       </Router>
+      <DevTools />
     </div>
   </Provider>
 )
