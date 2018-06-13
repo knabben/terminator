@@ -3,4 +3,3 @@ run:
 
 run-web:
 	cd terminator; yarn start
-

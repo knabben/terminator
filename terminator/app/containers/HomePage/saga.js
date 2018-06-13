@@ -2,10 +2,12 @@
  * Gets the repositories of the user from Github
  */
 
+import { take, all } from 'redux-saga/effects';
 import { call, put, select, takeLatest } from 'redux-saga/effects';
 import { LOAD_REPOS } from 'containers/App/constants';
 import { reposLoaded, repoLoadingError } from 'containers/App/actions';
 
+import { eventChannel } from 'redux-saga'
 import request from 'utils/request';
 import { makeSelectUsername } from 'containers/HomePage/selectors';
 
@@ -26,13 +28,40 @@ export function* getRepos() {
   }
 }
 
-/**
- * Root saga manages watcher lifecycle
- */
-export default function* githubData() {
-  // Watches for LOAD_REPOS actions and calls getRepos when one comes in.
-  // By using `takeLatest` only the result of the latest API call is applied.
-  // It returns task descriptor (just like fork) so we can continue execution
-  // It will be cancelled automatically on component unmount
-  yield takeLatest(LOAD_REPOS, getRepos);
+function createSocketChannel() {
+  const wsUrl = "ws://localhost:8000/ws/events/"
+
+  return eventChannel(emitter => {
+    const ws = new WebSocket(wsUrl)
+
+    ws.onopen = () => {
+      console.log('opening...')
+      ws.send('hello server')
+    }
+
+    ws.onerror = (error) => {
+      console.log('WebSocket error ' + error)
+      console.dir(error)
+    }
+
+    ws.onmessage = (e) => {
+      console.log('here')
+      console.log(e)
+    }
+
+    // unsubscribe function
+    const unsubscribe = () => {
+      console.log('Socket off')
+    }
+
+    return unsubscribe
+  })
+}
+
+export default function* wsSagas() {
+  const socket = yield call(createSocketChannel)
+
+  while (true) {
+    const payload = yield take(socket)
+  }
 }
