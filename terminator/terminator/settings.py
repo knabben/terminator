@@ -14,6 +14,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'webpack_loader',
     'rest_framework',
+    'channels',
     'proxy'
 ]
 
@@ -26,19 +27,6 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
-
-# OAUTH2_PROVIDER = {
-#     'SCOPES': {'read': 'Read scope', 'write': 'Write scope', 'groups': 'Access to your groups'}
-# }
-
-# REST_FRAMEWORK = {
-#     'DEFAULT_AUTHENTICATION_CLASSES': (
-#         'oauth2_provider.ext.rest_framework.OAuth2Authentication',
-#     ),
-#     'DEFAULT_PERMISSION_CLASSES': (
-#         'rest_framework.permissions.IsAuthenticated',
-#     )
-# }
 
 ROOT_URLCONF = 'terminator.urls'
 
@@ -59,7 +47,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'terminator.wsgi.application'
-
+ASGI_APPLICATION = 'terminator.routing.application'
 
 # Database
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
