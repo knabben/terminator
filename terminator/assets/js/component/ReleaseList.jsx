@@ -13,7 +13,7 @@ class ReleaseList extends React.Component {
     componentWillMount() {
         const { dispatch } = this.props
         dispatch(fetchReleases())
-    } 
+    }
 
     deleteRelease(releaseName) {
       this.props.dispatch(delRelease(releaseName));
@@ -25,7 +25,7 @@ class ReleaseList extends React.Component {
             <div>
               {isFetching &&
                 <div className="loading text-center">
-                  Loading...
+                  ...
                 </div>
               }
 

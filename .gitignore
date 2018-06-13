@@ -1,6 +1,7 @@
-*pyc
+*.pyc
 db.sqlite3
 
+__pycache__
 # JavaScript
 bundles
 node_modules

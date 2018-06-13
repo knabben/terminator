@@ -6,7 +6,7 @@ import { Link } from 'react-router'
 const App = () => (
   <div>
     <div className="create-label">
-      <Link to="/create">Create</Link>
+      <Link to="/create">Xablau</Link>
     </div>
     <VisibleReleaseList />
   </div>

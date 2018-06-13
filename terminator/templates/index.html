@@ -1,30 +1,16 @@
 {% load render_bundle from webpack_loader %}
 {% load static %}
+
 <!DOCTYPE html>
 <html>
   <head>
       <meta charset="UTF-8">
-      <title>Example</title>
-      <link rel="stylesheet" href="{% static "global/css/bootstrap.min.css" %}"/>
-      <script src="{% static "global/jquery-3.1.1.slim.min.js" %}"></script>
-      <script src="{% static "global/tether.min.js" %}"></script>
-      <script src="{% static "global/bootstrap.min.js" %}"></script>
+      <title>TERMinator</title>
   </head>
-    <body>
-        <nav class="navbar">
-            <a class="navbar-brand text-left" href="#">terminator</a>
-            <div class="glowbar"></div>
-        </nav>
-        <div class="main-panel">
-            <div class="row">
-                <div class="col-md-12 border">
-                    <div class="top-nav">
-                    HELM charts 
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div id="app"></div>
-    </body>
-    {% render_bundle 'main' %}
+  <body>
+      <div id="app"></div>
+  </body>
+
+  <script type="text/javascript" src="http://localhost:3000/reactBoilerplateDeps.dll.js"></script>
+  {% render_bundle 'main' %}
 </html>
