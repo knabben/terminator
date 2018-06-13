@@ -1,0 +1,13 @@
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  name: terminators.app.terminator.dev
+spec:
+  group: app.terminator.dev
+  names:
+    kind: Terminator
+    listKind: TerminatorList
+    plural: terminators
+    singular: terminator
+  scope: Namespaced
+  version: v1alpha1
