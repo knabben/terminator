@@ -2,3 +2,5 @@ apiVersion: "app.terminator.dev/v1alpha1"
 kind: "Terminator"
 metadata:
   name: "example"
+spec:
+  memcache: "fdhsahfdsufhduh"

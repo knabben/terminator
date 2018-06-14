@@ -1,6 +1,7 @@
 package stub
 
 import (
+	"net/url"
 	"context"
 
 	"github.com/knabben/terminator/term-operator/pkg/apis/app/v1alpha1"
@@ -11,22 +12,44 @@ import (
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
+
+	"github.com/gorilla/websocket"
 )
 
 func NewHandler() sdk.Handler {
-	return &Handler{}
+	u := url.URL{
+		Scheme: "ws",
+		Host: "192.168.99.1:8000",
+		Path: "ws/events/",
+	}
+	conn, _, err := websocket.DefaultDialer.Dial(u.String(), nil)
+	if err != nil {
+		panic(err)
+	}
+
+	return &Handler{conn: conn}
 }
 
 type Handler struct {
-	// Fill me
+	conn *websocket.Conn
 }
+
 
 func (h *Handler) Handle(ctx context.Context, event sdk.Event) error {
 	switch o := event.Object.(type) {
 	case *v1alpha1.Terminator:
 		err := sdk.Create(newbusyBoxPod(o))
+
 		if err != nil && !errors.IsAlreadyExists(err) {
 			logrus.Errorf("Failed to create busybox pod : %v", err)
+			return err
+		}
+
+		err = h.conn.WriteMessage(websocket.TextMessage,
+			[]byte(string(o.Spec.Memcache)))
+
+		if err != nil {
+			logrus.Errorf("write:", err)
 			return err
 		}
 	}

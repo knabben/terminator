@@ -22,8 +22,8 @@ type Terminator struct {
 }
 
 type TerminatorSpec struct {
-	// Fill me
+	Memcache string `json:"memcache"`
 }
 type TerminatorStatus struct {
-	// Fill me
+	MemcacheNode string `json:"memcacheNode"`
 }
