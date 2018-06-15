@@ -22,8 +22,11 @@ type Terminator struct {
 }
 
 type TerminatorSpec struct {
-	Memcache string `json:"memcache"`
+	Memcache bool `json:"memcache"`
+	Redis    bool `json:"redis"`
 }
+
 type TerminatorStatus struct {
-	MemcacheNode string `json:"memcacheNode"`
+	MemcacheNode []string `json:"memcacheNode"`
+	RedisNode    []string `json:"redisNode"`
 }
