@@ -1,0 +1,19 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+  config.vm.box = "debian/jessie64"
+
+  config.disksize.size = '20GB'
+  config.vm.network "private_network", ip: "192.168.99.252"
+
+  config.vm.synced_folder "~/.projects", "/home/vagrant/projects"
+
+  config.vm.provider "virtualbox" do |vb|
+    vb.gui = true
+    vb.memory = "2024"
+    vb.cpus = 4
+  end
+
+  config.vm.provision "shell", path: "install.sh"
+end
