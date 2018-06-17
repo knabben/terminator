@@ -22,7 +22,8 @@ machine$ vagrant up
 To bring the backing services up, run:
 
 ```
-$ ./default_charts.sh
+$ helm init
+$ ./machine/install-charts.sh
 ```
 
 ### Listen ports Locally

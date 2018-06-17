@@ -31,12 +31,3 @@ PSQL_PASS="postgres"
 runService "postgis" "stable/postgresql" "--set image=knabben/postgis-sniffer
                                           --set imageTag=latest
                                           --set postgresPassword=${PSQL_PASS}"
-
-# --- Redis
-
-runService "redis" "stable/redis" "--set usePassword=false"
-
-
-# --- Memcached
-
-runService "memcache" "stable/memcached"
