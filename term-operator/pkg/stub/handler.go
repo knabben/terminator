@@ -7,8 +7,6 @@ import (
 	"github.com/knabben/terminator/term-operator/pkg/terminator"
 
 	"github.com/operator-framework/operator-sdk/pkg/sdk"
-	//appsv1 "k8s.io/api/apps/v1"
-	//"k8s.io/apimachinery/pkg/runtime/schema"
 )
 
 func NewHandler() sdk.Handler {

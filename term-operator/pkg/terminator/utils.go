@@ -46,12 +46,11 @@ func asOwner(m *v1alpha1.Terminator) metav1.OwnerReference {
 // belonging to the given terminator CR name.
 func labelsFor(name, termType string) map[string]string {
 	return map[string]string{
-		"app": name, "term-type": termType, "hasta": "la-vista"}
+		"app": termType, "terminator": name, "hasta": "la-vista"}
 
 }
 
 // addOwnerRefToObject appends the desired OwnerReference to the object
 func addOwnerRefToObject(obj metav1.Object, ownerRef metav1.OwnerReference) {
 	obj.SetOwnerReferences(append(obj.GetOwnerReferences(), ownerRef))
-
 }
