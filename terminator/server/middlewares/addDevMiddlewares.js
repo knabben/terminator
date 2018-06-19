@@ -1,4 +1,5 @@
 const path = require('path');
+const cors = require('cors');
 const webpack = require('webpack');
 const webpackDevMiddleware = require('webpack-dev-middleware');
 const webpackHotMiddleware = require('webpack-hot-middleware');
@@ -16,6 +17,7 @@ module.exports = function addDevMiddlewares(app, webpackConfig) {
   const compiler = webpack(webpackConfig);
   const middleware = createWebpackMiddleware(compiler, webpackConfig.output.publicPath);
 
+  app.use(cors());
   app.use(middleware);
   app.use(webpackHotMiddleware(compiler));
 
