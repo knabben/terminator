@@ -6,6 +6,7 @@ import (
 	"net/url"
 
 	"github.com/gorilla/websocket"
+	"github.com/sirupsen/logrus"
 )
 
 // ConnectWebSocket start a long poll connection
@@ -16,8 +17,28 @@ func ConnectWebsocket() (*websocket.Conn, error) {
 	return conn, err
 }
 
+func (h *Handler) tryConnect() error {
+	conn, err := ConnectWebsocket()
+	if err != nil {
+		logrus.Warn(err)
+		return err
+	}
+	h.conn = conn
+	return nil
+}
+
 //SendWebsocketStatus
-func SendWebsocketStatus(term *v1alpha1.Terminator, conn *websocket.Conn) error {
+func (h *Handler) SendWebsocketStatus(term *v1alpha1.Terminator) error {
 	data, _ := json.Marshal(term)
-	return conn.WriteMessage(websocket.TextMessage, data)
+
+	if h.conn == nil {
+		h.tryConnect()
+	}
+
+	err := h.conn.WriteMessage(websocket.TextMessage, data)
+	if err != nil {
+		h.tryConnect()
+		return err
+	}
+	return nil
 }

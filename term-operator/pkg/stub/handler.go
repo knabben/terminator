@@ -30,7 +30,7 @@ func (h *Handler) Handle(ctx context.Context, event sdk.Event) error {
 		terminator.Reconcile(o, event)
 
 		// Send terminator status via websockets
-		SendWebsocketStatus(o, h.conn)
+		h.SendWebsocketStatus(o)
 
 	}
 	return nil
