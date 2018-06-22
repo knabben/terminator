@@ -27,8 +27,5 @@ func Reconcile(term *v1alpha1.Terminator, event sdk.Event) error {
 	go setReplica(memcacheDep, memcacheRep)
 	go setReplica(redisDep, redisRep)
 
-	// Send terminator status via websockets
-	go SendWebsocketStatus(term)
-
 	return nil
 }

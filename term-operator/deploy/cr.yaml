@@ -1,6 +1,7 @@
 apiVersion: "app.terminator.dev/v1alpha1"
 kind: "Terminator"
 metadata:
-  name: "example"
+  name: "deploy2"
 spec:
-  memcache: "fdhsahfdsufhduh"
+  memcache: true
+  redis: true

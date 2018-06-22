@@ -1,4 +1,4 @@
-package terminator
+package stub
 
 import (
 	"encoding/json"
@@ -6,7 +6,6 @@ import (
 	"net/url"
 
 	"github.com/gorilla/websocket"
-	"github.com/sirupsen/logrus"
 )
 
 // ConnectWebSocket start a long poll connection
@@ -18,14 +17,7 @@ func ConnectWebsocket() (*websocket.Conn, error) {
 }
 
 //SendWebsocketStatus
-func SendWebsocketStatus(term *v1alpha1.Terminator) error {
-	conn, err := ConnectWebsocket()
-
-	if err != nil {
-		logrus.Warn(err)
-		return err
-	}
-
-	data, err := json.Marshal(term)
+func SendWebsocketStatus(term *v1alpha1.Terminator, conn *websocket.Conn) error {
+	data, _ := json.Marshal(term)
 	return conn.WriteMessage(websocket.TextMessage, data)
 }
