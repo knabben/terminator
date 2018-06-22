@@ -1,17 +1,32 @@
-/**
- * Homepage selectors
- */
-
 import { createSelector } from 'reselect';
 
-const selectHome = (state) => state.get('home');
+const selectTerm = (state) => state.get('terminator');
 
-const makeSelectUsername = () => createSelector(
-  selectHome,
-  (homeState) => homeState.get('username')
+const makeSelectVersion = () => createSelector(
+  selectTerm,
+  (termState) => termState.get('version')
+);
+
+const makeSelectKind = () => createSelector(
+  selectTerm,
+  (termState) => termState.get('kind')
+);
+
+
+const makeSelectStatus = () => createSelector(
+  selectTerm,
+  (termState) => termState.get('status')
+);
+
+const makeSelectSpec = () => createSelector(
+  selectTerm,
+  (termState) => termState.get('spec')
 );
 
 export {
-  selectHome,
-  makeSelectUsername,
+  selectTerm,
+  makeSelectVersion,
+  makeSelectKind,
+  makeSelectSpec,
+  makeSelectStatus,
 };

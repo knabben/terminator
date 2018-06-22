@@ -4,36 +4,15 @@
 
 import { take, all } from 'redux-saga/effects';
 import { call, put, select, takeLatest } from 'redux-saga/effects';
-import { LOAD_REPOS } from 'containers/App/constants';
-import { reposLoaded, repoLoadingError } from 'containers/App/actions';
+import { DELETE_CRD } from './constants'
+
+import { sendTerminatorPayload, repoLoadingError } from './actions';
 
 import { eventChannel } from 'redux-saga'
 import request from 'utils/request';
-import { makeSelectUsername } from 'containers/HomePage/selectors';
 
-/**
- * Github repos request/response handler
- */
-export function* getRepos() {
-  // Select username from store
-  const username = yield select(makeSelectUsername());
-  const requestURL = `https://api.github.com/users/${username}/repos?type=all&sort=updated`;
-
-  try {
-    // Call our request helper (see 'utils/request')
-    const repos = yield call(request, requestURL);
-    yield put(reposLoaded(repos, username));
-  } catch (err) {
-    yield put(repoLoadingError(err));
-  }
-}
-
-function createSocketChannel() {
-  const wsUrl = "ws://localhost:8000/ws/events/"
-
+function* createSocketChannel(ws) {
   return eventChannel(emitter => {
-    const ws = new WebSocket(wsUrl)
-
     ws.onopen = () => {
       console.log('opening...')
     }
@@ -43,11 +22,11 @@ function createSocketChannel() {
       console.dir(error)
     }
 
-
     ws.onmessage = (e) => {
+      console.log(e)
       try {
         const payload = JSON.parse(e.data).message
-        console.log(JSON.parse(payload))
+        emitter(JSON.parse(payload))
       } catch(err) {
         console.error(err)
       }
@@ -62,10 +41,35 @@ function createSocketChannel() {
   })
 }
 
+function* sendDeleteCRD(action, ws) {
+  return eventChannel(emitter => {
+    ws.onopen = () => {
+      console.log("opening for send")
+      emitter.send({'delete': action.name})
+    }
+
+    ws.onerror = (error) => {
+      console.log('WebSocket error ' + error)
+      console.dir(error)
+    }
+
+    const unsubscribe = () => {
+      console.log('Socket off')
+    }
+
+    return unsubscribe
+  })
+}
+
 export default function* wsSagas() {
-  const socket = yield call(createSocketChannel)
+  const wsUrl = "ws://localhost:8000/ws/events/"
+  const ws = new WebSocket(wsUrl)
+  const socket = yield call(createSocketChannel, ws)
+
+  yield takeLatest(DELETE_CRD, sendDeleteCRD, ws)
 
   while (true) {
     const payload = yield take(socket)
+    yield put(sendTerminatorPayload(payload))
   }
 }

@@ -16,6 +16,7 @@
  */
 
 import {
+  TERMINATOR_PAYLOAD,
   LOAD_REPOS,
   LOAD_REPOS_SUCCESS,
   LOAD_REPOS_ERROR,
@@ -33,21 +34,12 @@ export function loadRepos() {
 }
 
 /**
- * Dispatched when the repositories are loaded by the request saga
+ * Dispatched when a new payload arrives.
  *
- * @param  {array} repos The repository data
- * @param  {string} username The current username
+ * @param  {array} payload Websocket payload
  *
- * @return {object}      An action object with a type of LOAD_REPOS_SUCCESS passing the repos
+ * @return {object}      An action object with a type of TERMIANTOR_PAYLOAD 
  */
-export function reposLoaded(repos, username) {
-  return {
-    type: LOAD_REPOS_SUCCESS,
-    repos,
-    username,
-  };
-}
-
 /**
  * Dispatched when loading the repositories fails
  *

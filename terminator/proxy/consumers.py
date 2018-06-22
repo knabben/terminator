@@ -1,34 +1,38 @@
 import json
 import time
 
+from datetime import datetime
+
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
 
 
 class Consumer(WebsocketConsumer):
+
     def connect(self):
-        async_to_sync(self.channel_layer.group_add)(
-            'default',
-            self.channel_name
-        )
+        print("CONNECT", self)
+        print(self.channel_layer)
+        async_to_sync(self.channel_layer.group_add)('data', self.channel_name)
         self.accept()
 
-    # Receive message from WebSocket
+    def disconnect(self, close_code):
+        print("DISCONNECT")
+        async_to_sync(self.channel_layer.group_discard)('data', self.channel_name)
+
     def receive(self, text_data):
-        # Send message to room group
+        print("receive", datetime.now())
+        print(text_data)
+
         async_to_sync(self.channel_layer.group_send)(
-            'default',
+            'data',
             {
-                'type': 'chat_message',
+                'type': 'chat',
                 'message': text_data
             }
         )
 
-    # Receive message from room group
-    def chat_message(self, event):
+    def chat(self, event):
         message = event['message']
 
-        # Send message to WebSocket
-        self.send(text_data=json.dumps({
-            'message': message
-        }))
+        print("send to websocket", datetime.now())
+        self.send(text_data=json.dumps({'message': message}))
