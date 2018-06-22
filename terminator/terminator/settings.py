@@ -101,9 +101,3 @@ WEBPACK_LOADER = {
         'STATS_FILE': os.path.join(BASE_DIR, 'webpack-stats.json'),
     }
 }
-
-# HELM fetch GRPC connection via Kubernetes pod PortForward,
-# you can achieve it by:
-#
-# $ kubectl port-forward tiller-pod --namespace=kube-system :44134
-TILLER_HOST = os.environ.get("TILLER", False) or "localhost:44134"

@@ -2,9 +2,11 @@
 db.sqlite3
 
 __pycache__
+
 # JavaScript
 bundles
 node_modules
+npm_debug.log
 
 vendor
 

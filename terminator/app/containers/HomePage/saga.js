@@ -36,7 +36,6 @@ function createSocketChannel() {
 
     ws.onopen = () => {
       console.log('opening...')
-      ws.send('hello server')
     }
 
     ws.onerror = (error) => {
@@ -44,9 +43,14 @@ function createSocketChannel() {
       console.dir(error)
     }
 
+
     ws.onmessage = (e) => {
-      console.log('here')
-      console.log(e)
+      try {
+        const payload = JSON.parse(e.data).message
+        console.log(JSON.parse(payload))
+      } catch(err) {
+        console.error(err)
+      }
     }
 
     // unsubscribe function
