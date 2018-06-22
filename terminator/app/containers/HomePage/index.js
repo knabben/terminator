@@ -6,10 +6,12 @@ import { connect } from 'react-redux';
 import { compose } from 'redux';
 import { createStructuredSelector } from 'reselect';
 
+import styled from 'styled-components';
+
 import injectReducer from 'utils/injectReducer';
 import injectSaga from 'utils/injectSaga';
-import { makeSelectRepos, makeSelectLoading, makeSelectError } from 'containers/App/selectors';
 import H2 from 'components/H2';
+import A from 'components/A';
 import ReposList from 'components/ReposList';
 import AtPrefix from './AtPrefix';
 import CenteredSection from './CenteredSection';
@@ -18,26 +20,52 @@ import Input from './Input';
 import Section from './Section';
 import messages from './messages';
 import { loadRepos } from '../App/actions';
-import { changeUsername } from './actions';
-import { makeSelectUsername } from './selectors';
+import { makeSelectVersion, makeSelectKind, makeSelectSpec, makeSelectStatus } from './selectors';
 import reducer from './reducer';
 import saga from './saga';
 
-export class HomePage extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+import { sendDeleteCRD } from './actions'
 
+const Header = styled.div`
+text-align: center;
+font-size: 12px;
+`
+
+export class Item extends React.PureComponent {
   render() {
-    const { loading, error, repos } = this.props;
-    const reposListProps = {
-      loading,
-      error,
-      repos,
-    };
+    const { name, exists, status } = this.props
 
     return (
-      <div>howdy</div>
+      <div>
+        {name} - {exists && <button onClick={() => this.props.onDelete(name)}>delete</button>} - {status}
+      </div>
     )
   }
 }
+
+export class HomePage extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+  render() {
+    const { spec, status } = this.props;
+
+    return (
+      <div>
+        <Item
+            name="memcache"
+            exists={spec.memcache}
+            status={status.memcacheNode}
+            onDelete={this.props.onDelete}
+        />
+        <Item
+            name="redis"
+            exists={spec.redis}
+            status={status.redisNode}
+            onDelete={this.props.onDelete}
+        />
+      </div>
+    )
+  }
+}
+
 
 HomePage.propTypes = {
   loading: PropTypes.bool,
@@ -49,31 +77,24 @@ HomePage.propTypes = {
     PropTypes.array,
     PropTypes.bool,
   ]),
-  onSubmitForm: PropTypes.func,
-  username: PropTypes.string,
-  onChangeUsername: PropTypes.func,
 };
+
+const mapStateToProps = createStructuredSelector({
+  kind: makeSelectKind(),
+  version: makeSelectVersion(),
+  spec: makeSelectSpec(),
+  status: makeSelectStatus(),
+});
 
 export function mapDispatchToProps(dispatch) {
   return {
-    onChangeUsername: (evt) => dispatch(changeUsername(evt.target.value)),
-    onSubmitForm: (evt) => {
-      if (evt !== undefined && evt.preventDefault) evt.preventDefault();
-      dispatch(loadRepos());
-    },
-  };
+    onDelete: evt => dispatch(sendDeleteCRD(evt))
+  }
 }
 
-const mapStateToProps = createStructuredSelector({
-  repos: makeSelectRepos(),
-  username: makeSelectUsername(),
-  loading: makeSelectLoading(),
-  error: makeSelectError(),
-});
-
 const withConnect = connect(mapStateToProps, mapDispatchToProps);
-const withReducer = injectReducer({ key: 'home', reducer });
-const withSaga = injectSaga({ key: 'home', saga });
+const withReducer = injectReducer({ key: 'terminator', reducer });
+const withSaga = injectSaga({ key: 'terminator', saga });
 
 export default compose(
   withReducer,

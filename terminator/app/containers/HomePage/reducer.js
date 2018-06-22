@@ -1,35 +1,38 @@
 /*
- * HomeReducer
+ * TerminatorReducer
  *
- * The reducer takes care of our data. Using actions, we can change our
- * application state.
- * To add a new action, add it to the switch statement in the reducer function
- *
- * Example:
- * case YOUR_ACTION_CONSTANT:
- *   return state.set('yourStateVariable', true);
  */
 import { fromJS } from 'immutable';
 
 import {
-  CHANGE_USERNAME,
+  TERMINATOR_PAYLOAD,
 } from './constants';
 
-// The initial state of the App
 const initialState = fromJS({
-  username: '',
+  kind: undefined,
+  version: undefined,
+  spec: {
+    memcache: false,
+    redis: false,
+  },
+  status: {
+    memcacheNode: [],
+    redisNode: [],
+  }
 });
 
-function homeReducer(state = initialState, action) {
+function terminatorReducer(state = initialState, action) {
   switch (action.type) {
-    case CHANGE_USERNAME:
-
-      // Delete prefixed '@' from the github username
+    case TERMINATOR_PAYLOAD:
       return state
-        .set('username', action.name.replace(/@/gi, ''));
+        .set('version', action.payload.apiVersion)
+        .set('kind', action.payload.kind)
+        .set('metadata', action.payload.metadata)
+        .set('spec', action.payload.spec)
+        .set('status', action.payload.status)
     default:
       return state;
   }
 }
 
-export default homeReducer;
+export default terminatorReducer;
