@@ -1,0 +1,14 @@
+FROM node:9.11.2-slim
+
+WORKDIR /app
+
+COPY .gitignore .
+COPY internals internals/
+COPY server server/
+COPY yarn.lock .
+COPY package.json .
+RUN yarn install
+
+COPY app app/
+
+CMD ["yarn", "run", "start:production"]

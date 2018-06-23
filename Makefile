@@ -8,6 +8,23 @@ web-run:
 	yarn start && \
 	python manage.py runserver 0.0.0.0:8000
 
+web-build:
+	cd webserver && \
+	docker build -f Dockerfile.dj -t web-ops:latest . && \
+	docker build -f Dockerfile.fr -t web-front:latest . && \
+	docker tag web-ops:latest knabben/web-ops:latest && \
+	docker tag web-front:latest knabben/web-front:latest
+
+web-push:
+	docker push knabben/web-ops:latest
+	docker push knabben/web-front:latest
+
+web-deploy:
+	kubectl create -f webserver/deploy/webserver.yaml
+
+web-clean:
+	kubectl delete -f webserver/deploy/webserver.yaml
+
 generate:
 	operator-sdk generate k8s
 

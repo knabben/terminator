@@ -92,3 +92,26 @@ to run the stack locally run:
 ```
 make web-run
 ```
+
+## Building the image
+
+```
+$ make web-build
+$ make web-push
+````
+
+### Deploy it
+
+Deploy on production, it will create 3 containers inside the web-ops, daphne, django and frontend:
+
+```
+$ make web-deploy
+```
+
+### Clean
+
+To remove the Pod from cluster, just use:
+
+```
+$ make web-clean
+```

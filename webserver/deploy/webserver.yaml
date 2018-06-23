@@ -1,0 +1,42 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-ops
+  labels:
+    app: web-ops
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8090
+      targetPort: 8001
+      protocol: TCP
+      name: daphne
+    - port: 8091
+      targetPort: 8000
+      protocol: TCP
+      name: django
+    - port: 8092
+      targetPort: 3000
+      protocol: TCP
+      name: front
+  selector:
+    app: web-ops
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: web-ops
+  labels:
+    app: web-ops
+spec:
+  containers:
+  - name: django
+    image: knabben/web-ops:latest
+    imagePullPolicy: Never
+  - name: daphne
+    image: knabben/web-ops:latest
+    imagePullPolicy: Never
+    command: ["daphne", "-b", "0.0.0.0", "-p", "8001", "terminator.asgi:application"]
+  - name: frontend
+    image: knabben/web-front:latest
+    imagePullPolicy: Never
