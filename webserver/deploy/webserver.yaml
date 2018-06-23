@@ -8,17 +8,17 @@ spec:
   type: ClusterIP
   ports:
     - port: 8090
-      targetPort: 8001
+      targetPort: 8090
       protocol: TCP
-      name: daphne
+      name: frontend
     - port: 8091
-      targetPort: 8000
+      targetPort: 8091
       protocol: TCP
       name: django
     - port: 8092
-      targetPort: 3000
+      targetPort: 8092
       protocol: TCP
-      name: front
+      name: daphne
   selector:
     app: web-ops
 ---
@@ -36,7 +36,10 @@ spec:
   - name: daphne
     image: knabben/web-ops:latest
     imagePullPolicy: Never
-    command: ["daphne", "-b", "0.0.0.0", "-p", "8001", "terminator.asgi:application"]
+    env:
+    - name: REDIS_HOST
+      value: "deploy-redis.default.svc"
+    command: ["daphne", "-b", "0.0.0.0", "-p", "8092", "terminator.asgi:application"]
   - name: frontend
     image: knabben/web-front:latest
     imagePullPolicy: Never

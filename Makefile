@@ -37,7 +37,11 @@ ops-deploy:
 	kubectl apply -f term-operator/deploy/crd.yaml && \
 	kubectl apply -f term-operator/deploy/operator.yaml
 
+ops-push:
+	docker push knabben/ops:latest
+
 ops-clean:
+	rm term-operator/tmp/_output/bin/term-operator && \
 	cd term-operator && \
 	kubectl delete -f deploy/rbac.yaml && \
 	kubectl delete -f deploy/crd.yaml && \

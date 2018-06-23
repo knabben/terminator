@@ -48,12 +48,12 @@ TEMPLATES = [
 WSGI_APPLICATION = 'terminator.wsgi.application'
 ASGI_APPLICATION = 'terminator.routing.application'
 
+REDIS_HOST = [(os.environ.get('REDIS_HOST'), 6379)]
+
 CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
-        'CONFIG': {
-             'hosts': [('127.0.0.1', 6379)]
-        },
+        'CONFIG': { 'hosts': REDIS_HOST },
     },
 }
 # Database

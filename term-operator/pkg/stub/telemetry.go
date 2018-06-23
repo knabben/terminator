@@ -11,7 +11,7 @@ import (
 
 // ConnectWebSocket start a long poll connection
 func ConnectWebsocket() (*websocket.Conn, error) {
-	u := url.URL{Scheme: "ws", Host: "192.168.99.1:8000", Path: "ws/events/"}
+	u := url.URL{Scheme: "ws", Host: "web-ops.default.svc:8092", Path: "ws/events/"}
 
 	conn, _, err := websocket.DefaultDialer.Dial(u.String(), nil)
 	return conn, err
