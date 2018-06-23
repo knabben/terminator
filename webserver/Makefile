@@ -4,9 +4,8 @@ export KUBERNETES_CONFIG := ${HOME}/.kube/config
 export WATCH_NAMESPACE := default
 
 web-run:
-	cd webserver && \
-	yarn start && \
-	python manage.py runserver 0.0.0.0:8000
+	cd terminator; yarn start &
+	python terminator/manage.py runserver 0.0.0.0:8000
 
 generate:
 	operator-sdk generate k8s

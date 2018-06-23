@@ -1,6 +1,4 @@
-## Kube-Dev
-
-## Setup
+## Kube-Dev - setup
 
 ### Minikube
 
@@ -17,7 +15,7 @@ machine$ vagrant up
 
 ## Work
 
-### Bringing services up
+### Bringing SOME services up
 
 To bring the backing services up, run:
 
@@ -25,10 +23,6 @@ To bring the backing services up, run:
 $ helm init
 $ ./machine/install-charts.sh
 ```
-
-### Listen ports Locally
-
-Take a look on https://github.com/knabben/forwarder
 
 ### Sniffing PostgreSQL
 

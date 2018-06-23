@@ -7,6 +7,10 @@ Kubernetes 12-factor backing services management, so far it supports:
 
 The project has 3 components, an operator, a backend and a frontend client. Telemetry is offered via Websockets for realtime monitoring.
 
+## Starting a cluster
+
+Check out dev-setup/README.md
+
 ## Operator
 
 ### Running local
