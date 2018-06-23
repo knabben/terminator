@@ -86,7 +86,7 @@ $ make ops-clean
 ### Running local
 
 The webserver is made up of 2 parts, the Django Channels backend that holds all 
-websockets request and a react/sagas listening that parses and show up the information,
+websockets request and a React/Sagas listening that parses and show up the information,
 to run the stack locally run:
 
 ```
@@ -115,3 +115,7 @@ To remove the Pod from cluster, just use:
 ```
 $ make web-clean
 ```
+
+### Accessing the dashboard
+
+Access the it on port: http://localhost:8092
