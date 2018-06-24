@@ -1,8 +1,5 @@
 .PHONY: deploy
 
-# Set to your development box ip
-export TELEMETRY_HOST := "192.168.99.1:8092"
-
 export PATH := ${PATH}:${PWD}/webserver/node_modules/.bin
 export KUBERNETES_CONFIG := ${HOME}/.kube/config
 export WATCH_NAMESPACE := default
