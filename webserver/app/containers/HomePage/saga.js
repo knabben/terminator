@@ -62,7 +62,8 @@ function* sendDeleteCRD(action, ws) {
 }
 
 export default function* wsSagas() {
-  const wsUrl = "ws://localhost:8000/ws/events/"
+  const wsUrl = "ws://localhost:8092/ws/events/"
+
   const ws = new WebSocket(wsUrl)
   const socket = yield call(createSocketChannel, ws)
 

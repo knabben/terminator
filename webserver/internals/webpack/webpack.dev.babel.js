@@ -43,7 +43,7 @@ module.exports = require('./webpack.base.babel')({
   // Add hot reloading in development
   entry: [
     'eventsource-polyfill', // Necessary for hot reloading with IE
-    'webpack-hot-middleware/client?reload=true&path=http://localhost:3000/__webpack_hmr',
+    'webpack-hot-middleware/client?reload=true&path=http://localhost:8090/__webpack_hmr',
     path.join(process.cwd(), 'app/app.js'), // Start with js/app.js
   ],
 
@@ -51,7 +51,6 @@ module.exports = require('./webpack.base.babel')({
   output: {
     filename: '[name].js',
     chunkFilename: '[name].chunk.js',
-    publicPath: 'http://localhost:3000/',
   },
 
   // Add development plugins
