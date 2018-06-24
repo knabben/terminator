@@ -19,7 +19,7 @@ import messages from './messages';
 import reducer from './reducer';
 import saga from './saga';
 import { makeSelectVersion, makeSelectKind, makeSelectSpec, makeSelectStatus } from './selectors';
-import { sendDeleteCRD } from './actions'
+import { sendDeleteCRD, sendCreateCRD } from './actions'
 
 const Header = styled.div`
   text-align: center;
@@ -52,6 +52,7 @@ const IconLay = styled.div`
   flex: 1 60px;
   margin: auto;
 `
+
 const Icon = styled.img`
   width: 50px;
   height: 50px;
@@ -75,11 +76,11 @@ export class Item extends React.PureComponent {
         <Status> {status} </Status>
         <Pods>
           {exists &&
-           <Button onClick={() => this.props.onDelete(name)}>delete</Button>
+           <Button onClick={() => this.props.onDelete(name)}>DELETE</Button>
           }
 
           {!exists &&
-           <Button onClick={() => this.props.onCreate(name)}>create</Button>
+           <Button onClick={() => this.props.onCreate(name)}>CREATE</Button>
           }
         </Pods>
       </ContainerWrapper>
@@ -87,13 +88,14 @@ export class Item extends React.PureComponent {
   }
 }
 
+
 export class HomePage extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
     const { spec, status } = this.props;
 
     return (
       <div>
-        <Header>** TBS - Terminator Backing Services - CONSOLE**</Header>
+        <Header>TBS - Terminator Backing Services - CONSOLE</Header>
         <Item
             name="memcache"
             exists={spec.memcache}
@@ -136,7 +138,7 @@ const mapStateToProps = createStructuredSelector({
 export function mapDispatchToProps(dispatch) {
   return {
     onDelete: evt => dispatch(sendDeleteCRD(evt)),
-    onCreate: evt => console.log(evt)
+    onCreate: evt => dispatch(sendCreateCRD(evt)),
   }
 }
 

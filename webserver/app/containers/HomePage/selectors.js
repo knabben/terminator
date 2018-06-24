@@ -12,7 +12,6 @@ const makeSelectKind = () => createSelector(
   (termState) => termState.get('kind')
 );
 
-
 const makeSelectStatus = () => createSelector(
   selectTerm,
   (termState) => termState.get('status')
