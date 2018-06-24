@@ -3,4 +3,6 @@ from django.contrib import admin
 
 from proxy import views
 
-urlpatterns = [url('^$', views.IndexView.as_view()),]
+urlpatterns = [
+    url('^crd$', views.CRDView.as_view()),
+]
