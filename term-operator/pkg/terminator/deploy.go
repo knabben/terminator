@@ -3,6 +3,7 @@ package terminator
 import (
 	"fmt"
 	"github.com/sirupsen/logrus"
+	"reflect"
 
 	"github.com/knabben/terminator/term-operator/pkg/apis/app/v1alpha1"
 	"github.com/operator-framework/operator-sdk/pkg/sdk"
@@ -51,6 +52,12 @@ func deploymentForMemcached(term *v1alpha1.Terminator) *appsv1.Deployment {
 	}
 	addOwnerRefToObject(dep, asOwner(term))
 	err := sdk.Create(dep)
+
+	podNames := getPodList(selectors, term.Namespace)
+	if !reflect.DeepEqual(podNames, term.Status.MemcacheNode) {
+		term.Status.MemcacheNode = podNames
+	}
+	setOperatorStatus(term)
 
 	if err != nil && !errors.IsAlreadyExists(err) {
 		logrus.Error(err)
@@ -128,6 +135,12 @@ func deploymentForRedis(term *v1alpha1.Terminator) *appsv1.Deployment {
 	addOwnerRefToObject(dep, asOwner(term))
 	err := sdk.Create(dep)
 
+	podNames := getPodList(selectors, term.Namespace)
+	if !reflect.DeepEqual(podNames, term.Status.RedisNode) {
+		term.Status.RedisNode = podNames
+	}
+	setOperatorStatus(term)
+
 	if err != nil && !errors.IsAlreadyExists(err) {
 		logrus.Info(err)
 	}
@@ -179,27 +192,13 @@ func setReplica(obj *appsv1.Deployment, replicas int32) error {
 	return nil
 }
 
-// func SetOperatorStatus(label, namespace, status) {
-// 	podList := podList()
-// 	labelSelector := labels.SelectorFromSet(label).String()
+func setOperatorStatus(term *v1alpha1.Terminator) error {
+	err := sdk.Update(term)
+	if err != nil {
+		logrus.Errorf("failed to update memcached status: %v", err)
+		return err
 
-// 	listOps := &metav1.ListOptions{LabelSelector: labelSelector}
-// 	err := sdk.List(terminator.Namespace, podList, sdk.WithListOptions(listOps))
+	}
 
-// 	if err != nil {
-// 		logrus.Errorf("failed to list pods: %v", err)
-// 		return err
-
-// 	}
-// 	podNames := getPodNames(podList.Items)
-// 	if !reflect.DeepEqual(podNames, terminator.Status.MemcacheNode) {
-// 		terminator.Status.MemcacheNode = podNames
-// 		err := sdk.Update(terminator)
-// 		if err != nil {
-// 			logrus.Errorf("failed to update memcached status: %v", err)
-// 			return err
-
-// 		}
-
-// 	}
-// }
+	return nil
+}

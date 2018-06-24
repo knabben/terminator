@@ -1,10 +1,14 @@
 package terminator
 
 import (
+	"github.com/sirupsen/logrus"
+
 	"github.com/knabben/terminator/term-operator/pkg/apis/app/v1alpha1"
+	"github.com/operator-framework/operator-sdk/pkg/sdk"
 
 	"k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/labels"
 )
 
 // podList returns a v1.PodList object
@@ -16,6 +20,24 @@ func podList() *v1.PodList {
 		},
 	}
 
+}
+
+//getPodList returns pods related with a particular label
+func getPodList(label map[string]string, namespace string) []string {
+	labelSelector := labels.SelectorFromSet(label).String()
+
+	podList := podList()
+
+	listOps := &metav1.ListOptions{LabelSelector: labelSelector}
+	err := sdk.List(namespace, podList, sdk.WithListOptions(listOps))
+
+	if err != nil {
+		logrus.Errorf("failed to list pods: %v", err)
+		return nil
+
+	}
+	podNames := getPodNames(podList.Items)
+	return podNames
 }
 
 // getPodNames returns the pod names of the array of pods passed in

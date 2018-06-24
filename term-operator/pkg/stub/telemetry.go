@@ -33,12 +33,12 @@ func (h *Handler) SendWebsocketStatus(term *v1alpha1.Terminator) error {
 
 	if h.conn == nil {
 		h.tryConnect()
-	}
-
-	err := h.conn.WriteMessage(websocket.TextMessage, data)
-	if err != nil {
-		h.tryConnect()
-		return err
+	} else {
+		err := h.conn.WriteMessage(websocket.TextMessage, data)
+		if err != nil {
+			h.tryConnect()
+			return err
+		}
 	}
 	return nil
 }
