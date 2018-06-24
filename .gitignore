@@ -11,3 +11,5 @@ npm_debug.log
 vendor
 
 webpack-stats.json
+
+term-operator/deploy/operator.yaml

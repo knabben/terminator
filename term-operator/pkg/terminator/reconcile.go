@@ -13,6 +13,7 @@ func Reconcile(term *v1alpha1.Terminator, event sdk.Event) error {
 
 	memcacheDep := deploymentForMemcached(term)
 	redisDep := deploymentForRedis(term)
+	rabbitDep := deploymentForRabbit(term)
 
 	var memcacheRep int32 = 0
 	if term.Spec.Memcache {
@@ -24,8 +25,14 @@ func Reconcile(term *v1alpha1.Terminator, event sdk.Event) error {
 		redisRep = 1
 	}
 
+	var rabbitRep int32 = 0
+	if term.Spec.Rabbitmq {
+		rabbitRep = 1
+	}
+
 	go setReplica(memcacheDep, memcacheRep)
 	go setReplica(redisDep, redisRep)
+	go setReplica(rabbitDep, rabbitRep)
 
 	return nil
 }

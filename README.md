@@ -4,6 +4,7 @@ Kubernetes 12-factor backing services management, so far it supports:
 
 * Memcache
 * Redis
+* RabbitMQ
 
 The project has 3 components, an operator, a backend and a frontend client. Telemetry is offered via Websockets for realtime monitoring.
 
@@ -51,6 +52,7 @@ metadata:
   spec:
     memcache: true
     redis: true
+    rabbitmq: false
 ```
 
 Basically you just need to tell the spec, which services you are going to need,

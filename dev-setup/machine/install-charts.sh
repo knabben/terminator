@@ -16,15 +16,6 @@ function runService() {
     fi
 }
 
-# --- RabbitMQ
-
-RABBITMQ_USER="admin"
-RABBITMQ_PASS="admin"
-
-runService "rabbitmq" "stable/rabbitmq" "--set rabbitmqUsername=${RABBITMQ_USER}
-                                         --set rabbitmqPassword=${RABBITMQ_PASS}"
-
-
 # --- PostgreSQL 10
 
 PSQL_PASS="postgres"

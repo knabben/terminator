@@ -14,6 +14,94 @@ import (
 	"k8s.io/apimachinery/pkg/api/errors"
 )
 
+// deploymentForRabbitmq returns a memcached Deployment object
+func deploymentForRabbit(term *v1alpha1.Terminator) *appsv1.Deployment {
+	name := fmt.Sprintf("%s-%s", term.Name, "rabbitmq")
+	selectors := labelsFor(term.Name, "rabbitmq")
+
+	dep := &appsv1.Deployment{
+		TypeMeta: metav1.TypeMeta{
+			APIVersion: "apps/v1",
+			Kind:       "Deployment",
+		},
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      name,
+			Namespace: term.Namespace,
+		},
+		Spec: appsv1.DeploymentSpec{
+			Selector: &metav1.LabelSelector{
+				MatchLabels: selectors,
+			},
+			Template: v1.PodTemplateSpec{
+				ObjectMeta: metav1.ObjectMeta{
+					Labels: selectors,
+				},
+				Spec: v1.PodSpec{
+					Containers: []v1.Container{{
+						Image: "bitnami/rabbitmq:3.7",
+						Name:  "rabbitmq",
+						Ports: []v1.ContainerPort{{
+							ContainerPort: 5672,
+							Name:          "rabbitmq",
+						}},
+						Env: []v1.EnvVar{
+							{
+								Name:  "RABBITMQ_USERNAME",
+								Value: "guest",
+							},
+							{
+								Name:  "RABBITMQ_PASSWORD",
+								Value: "guest",
+							},
+						},
+					}},
+				},
+			},
+		},
+	}
+	addOwnerRefToObject(dep, asOwner(term))
+	err := sdk.Create(dep)
+
+	podNames := getPodList(selectors, term.Namespace)
+	if !reflect.DeepEqual(podNames, term.Status.RabbitmqNode) {
+		term.Status.RabbitmqNode = podNames
+	}
+	setOperatorStatus(term)
+
+	if err != nil && !errors.IsAlreadyExists(err) {
+		logrus.Error(err)
+	}
+
+	svc := &v1.Service{
+		TypeMeta: metav1.TypeMeta{
+			Kind:       "Service",
+			APIVersion: "v1",
+		},
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      name,
+			Namespace: term.GetNamespace(),
+			Labels:    selectors,
+		},
+		Spec: v1.ServiceSpec{
+			Selector: selectors,
+			Ports: []v1.ServicePort{
+				{
+					Name:     "rabbitmq",
+					Protocol: v1.ProtocolTCP,
+					Port:     5672,
+				},
+			},
+		},
+	}
+	addOwnerRefToObject(svc, asOwner(term))
+	err = sdk.Create(svc)
+	if err != nil && !errors.IsAlreadyExists(err) {
+		logrus.Error("failed to create memcache service: %v", err)
+	}
+
+	return dep
+}
+
 // deploymentForMemcached returns a memcached Deployment object
 func deploymentForMemcached(term *v1alpha1.Terminator) *appsv1.Deployment {
 	name := fmt.Sprintf("%s-%s", term.Name, "memcache")

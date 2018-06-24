@@ -26,7 +26,7 @@ web-clean:
 	kubectl delete -f webserver/deploy/webserver.yaml
 
 generate:
-	operator-sdk generate k8s
+	cd term-operator && operator-sdk generate k8s
 
 build:
 	cd term-operator && operator-sdk build knabben/ops
