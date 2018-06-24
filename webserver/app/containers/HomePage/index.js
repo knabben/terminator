@@ -12,33 +12,77 @@ import injectReducer from 'utils/injectReducer';
 import injectSaga from 'utils/injectSaga';
 import H2 from 'components/H2';
 import A from 'components/A';
+import Button from 'components/Button';
 import ReposList from 'components/ReposList';
-import AtPrefix from './AtPrefix';
-import CenteredSection from './CenteredSection';
-import Form from './Form';
-import Input from './Input';
-import Section from './Section';
 import messages from './messages';
-import { loadRepos } from '../App/actions';
-import { makeSelectVersion, makeSelectKind, makeSelectSpec, makeSelectStatus } from './selectors';
+
 import reducer from './reducer';
 import saga from './saga';
-
+import { makeSelectVersion, makeSelectKind, makeSelectSpec, makeSelectStatus } from './selectors';
 import { sendDeleteCRD } from './actions'
 
 const Header = styled.div`
-text-align: center;
-font-size: 12px;
+  text-align: center;
+  color: #41addd;
+  font-size: 20px;
+  padding: 1.2em 0 1.2em 0;
+`
+
+const ContainerWrapper = styled.div`
+  display: flex;
+  height: 80px;
+  padding-bottom: 1em;
+  padding-top: 1em;
+`
+
+const Label = styled.div`
+  margin:auto;
+  align-self: auto;
+  flex: 1 100px;
+`
+
+const Pods = styled.div`
+  align-self: auto;
+  flex: 1 10px;
+  margin:auto;
+`
+
+const IconLay = styled.div`
+  align-self: auto;
+  flex: 1 60px;
+  margin: auto;
+`
+const Icon = styled.img`
+  width: 50px;
+  height: 50px;
+`
+const Status = styled.div`
+  align-self: auto;
+  font-size: 10px;
+  flex: 1 470px;
+  margin: auto;
 `
 
 export class Item extends React.PureComponent {
   render() {
     const { name, exists, status } = this.props
+    const iconPath = `icon-${name}.png`
 
     return (
-      <div>
-        {name} - {exists && <button onClick={() => this.props.onDelete(name)}>delete</button>} - {status}
-      </div>
+      <ContainerWrapper>
+        <IconLay> <Icon src={iconPath} /> </IconLay>
+        <Label> {name} </Label>
+        <Status> {status} </Status>
+        <Pods>
+          {exists &&
+           <Button onClick={() => this.props.onDelete(name)}>delete</Button>
+          }
+
+          {!exists &&
+           <Button onClick={() => this.props.onCreate(name)}>create</Button>
+          }
+        </Pods>
+      </ContainerWrapper>
     )
   }
 }
@@ -49,17 +93,20 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
 
     return (
       <div>
+        <Header>** TBS - Terminator Backing Services - CONSOLE**</Header>
         <Item
             name="memcache"
             exists={spec.memcache}
             status={status.memcacheNode}
             onDelete={this.props.onDelete}
+            onCreate={this.props.onCreate}
         />
         <Item
             name="redis"
             exists={spec.redis}
             status={status.redisNode}
             onDelete={this.props.onDelete}
+            onCreate={this.props.onCreate}
         />
       </div>
     )
@@ -88,7 +135,8 @@ const mapStateToProps = createStructuredSelector({
 
 export function mapDispatchToProps(dispatch) {
   return {
-    onDelete: evt => dispatch(sendDeleteCRD(evt))
+    onDelete: evt => dispatch(sendDeleteCRD(evt)),
+    onCreate: evt => console.log(evt)
   }
 }
 

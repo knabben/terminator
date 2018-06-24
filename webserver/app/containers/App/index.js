@@ -4,10 +4,9 @@ import styled from 'styled-components';
 import { Switch, Route } from 'react-router-dom';
 
 import HomePage from 'containers/HomePage/Loadable';
-import Header from 'components/Header';
 
 const AppWrapper = styled.div`
-  max-width: calc(900px + 16px * 2);
+  max-width: calc(800px + 16px * 2);
   margin: 0 auto;
   display: flex;
   min-height: 100%;
@@ -22,10 +21,8 @@ export default function App() {
         titleTemplate="Terminator"
         defaultTitle="TERMinator"
       >
-        <meta name="description" content="Hell of Terminator" />
+        <meta name="description" content="Terminator's Hell" />
       </Helmet>
-
-      <Header />
       <Switch>
         <Route exact path="/" component={HomePage} />
       </Switch>
