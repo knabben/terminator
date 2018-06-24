@@ -17,7 +17,7 @@ spec:
           image: knabben/ops
           command:
           - term-operator
-          imagePullPolicy: Always
+          imagePullPolicy: Never
           env:
             - name: TELEMETRY_HOST
               value: "web-ops.default.svc:8092"

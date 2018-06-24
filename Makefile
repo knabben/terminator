@@ -32,9 +32,11 @@ build:
 	cd term-operator && operator-sdk build knabben/ops
 
 ops-deploy:
-	@make build
 	kubectl apply -f term-operator/deploy/rbac.yaml && \
-	kubectl apply -f term-operator/deploy/crd.yaml && \
+	kubectl apply -f term-operator/deploy/crd.yaml
+
+ops-deploy-op:
+	@make build
 	kubectl apply -f term-operator/deploy/operator.yaml
 
 ops-push:
