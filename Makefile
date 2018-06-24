@@ -1,12 +1,15 @@
 .PHONY: deploy
 
+# Set to your development box ip
+export TELEMETRY_HOST := "192.168.99.1:8092"
+
+export PATH := ${PATH}:${PWD}/webserver/node_modules/.bin
 export KUBERNETES_CONFIG := ${HOME}/.kube/config
 export WATCH_NAMESPACE := default
 
 web-run:
-	cd webserver && \
-	yarn start && \
-	python manage.py runserver 0.0.0.0:8000
+	yarn --cwd webserver start &
+	python webserver/manage.py runserver 0.0.0.0:8092
 
 web-build:
 	cd webserver && \
