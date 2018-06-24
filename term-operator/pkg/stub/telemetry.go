@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/knabben/terminator/term-operator/pkg/apis/app/v1alpha1"
 	"net/url"
+	"os"
 
 	"github.com/gorilla/websocket"
 	"github.com/sirupsen/logrus"
@@ -11,7 +12,7 @@ import (
 
 // ConnectWebSocket start a long poll connection
 func ConnectWebsocket() (*websocket.Conn, error) {
-	u := url.URL{Scheme: "ws", Host: "web-ops.default.svc:8092", Path: "ws/events/"}
+	u := url.URL{Scheme: "ws", Host: os.Getenv("TELEMETRY_HOST"), Path: "ws/events/"}
 
 	conn, _, err := websocket.DefaultDialer.Dial(u.String(), nil)
 	return conn, err

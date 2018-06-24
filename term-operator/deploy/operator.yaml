@@ -19,6 +19,8 @@ spec:
           - term-operator
           imagePullPolicy: Always
           env:
+            - name: TELEMETRY_HOST
+              value: "web-ops.default.svc:8092"
             - name: WATCH_NAMESPACE
               valueFrom:
                 fieldRef:
