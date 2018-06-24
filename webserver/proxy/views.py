@@ -10,10 +10,16 @@ from kubernetes import client, config
 
 class CRDView(APIView):
 
-    def post(self, request, format=None):
-        svc_name = request.data.get("name")
+    def load_config(self):
+        try:
+            config.load_kube_config()
+        except FileNotFoundError:
+            config.load_incluster_config()
 
-        config.load_kube_config()
+    def post(self, request, format=None):
+        self.load_config()
+
+        svc_name = request.data.get("name")
         cli = client.ApiClient()
 
         api_instance = client.CustomObjectsApi()
@@ -32,9 +38,9 @@ class CRDView(APIView):
         return Response(data=api_response)
 
     def delete(self, request, format=None):
-        svc_name = request.data.get("name")
+        self.load_config()
 
-        config.load_kube_config()
+        svc_name = request.data.get("name")
         cli = client.ApiClient()
 
         api_instance = client.CustomObjectsApi()

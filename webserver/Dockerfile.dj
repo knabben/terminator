@@ -2,7 +2,7 @@ FROM python:3.6-alpine
 
 WORKDIR /app
 
-RUN apk update && apk add gcc musl-dev
+RUN apk update && apk add gcc musl-dev linux-headers build-base
 
 COPY requirements.txt .
 COPY manage.py .

@@ -11,10 +11,6 @@ spec:
       targetPort: 8090
       protocol: TCP
       name: frontend
-    - port: 8091
-      targetPort: 8091
-      protocol: TCP
-      name: django
     - port: 8092
       targetPort: 8092
       protocol: TCP
@@ -30,9 +26,6 @@ metadata:
     app: web-ops
 spec:
   containers:
-  - name: django
-    image: knabben/web-ops:latest
-    imagePullPolicy: Never
   - name: daphne
     image: knabben/web-ops:latest
     imagePullPolicy: Never
