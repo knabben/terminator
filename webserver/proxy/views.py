@@ -16,44 +16,30 @@ class CRDView(APIView):
         except FileNotFoundError:
             config.load_incluster_config()
 
-    def post(self, request, format=None):
-        self.load_config()
-
-        svc_name = request.data.get("name")
+    def client_request(self, body):
         cli = client.ApiClient()
 
         api_instance = client.CustomObjectsApi()
         group = 'app.terminator.dev'
         version = 'v1alpha1'
 
-        body = {
-            "spec": {
-                svc_name: True,
-            }
-        }
-
         api_response = api_instance.patch_namespaced_custom_object(
             group, version, 'default', 'terminators', 'deploy', body)
 
-        return Response(data=api_response)
+        return api_response
+
+    def post(self, request, format=None):
+        self.load_config()
+
+        name = request.data.get("name")
+        response = self.client_request({"spec": {name: True}})
+
+        return Response(data=response)
 
     def delete(self, request, format=None):
         self.load_config()
 
-        svc_name = request.data.get("name")
-        cli = client.ApiClient()
+        name = request.data.get("name")
+        response = self.client_request({"spec": {name: False}})
 
-        api_instance = client.CustomObjectsApi()
-        group = 'app.terminator.dev'
-        version = 'v1alpha1'
-
-        body = {
-            "spec": {
-                svc_name: False,
-            }
-        }
-
-        api_response = api_instance.patch_namespaced_custom_object(
-            group, version, 'default', 'terminators', 'deploy', body)
-
-        return Response(data=api_response)
+        return Response(data=response)

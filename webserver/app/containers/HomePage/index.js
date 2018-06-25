@@ -110,6 +110,13 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
             onDelete={this.props.onDelete}
             onCreate={this.props.onCreate}
         />
+        <Item
+            name="rabbitmq"
+            exists={spec.rabbitmq}
+            status={status.rabbitNode}
+            onDelete={this.props.onDelete}
+            onCreate={this.props.onCreate}
+        />
       </div>
     )
   }
