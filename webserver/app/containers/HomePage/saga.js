@@ -21,10 +21,11 @@ function* createSocketChannel(ws) {
     };
 
     ws.onmessage = (e) => {
-      console.log(e);
       try {
         const payload = JSON.parse(e.data).message;
-        emitter(JSON.parse(payload));
+        const data = JSON.parse(payload);
+        console.log(data);
+        emitter(data);
       } catch(err) {
         console.error(err);
       }

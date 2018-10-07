@@ -15,6 +15,32 @@ import (
 	"k8s.io/apimachinery/pkg/api/errors"
 )
 
+func startDeployment(dep *appsv1.Deployment, svc *v1.Service, term *v1alpha1.Terminator, selector map[string]string, node []string) *appsv1.Deployment {
+	addOwnerRefToObject(dep, asOwner(term))
+	err := sdk.Create(dep)
+
+	podNames := getPodList(selector, term.Namespace)
+	if !reflect.DeepEqual(podNames, node) {
+		node = podNames
+	}
+	setOperatorStatus(term)
+
+	if err != nil && !errors.IsAlreadyExists(err) {
+		raven.CaptureError(err, nil)
+		logrus.Error(err)
+	}
+
+	addOwnerRefToObject(svc, asOwner(term))
+	err = sdk.Create(svc)
+	if err != nil && !errors.IsAlreadyExists(err) {
+		raven.CaptureError(err, nil)
+		logrus.Error("failed to create memcache service: %v", err)
+	}
+
+	return dep
+
+}
+
 // deploymentForRabbitmq returns a memcached Deployment object
 func deploymentForRabbit(term *v1alpha1.Terminator) *appsv1.Deployment {
 	name := fmt.Sprintf("%s-%s", term.Name, "rabbitmq")
@@ -60,20 +86,6 @@ func deploymentForRabbit(term *v1alpha1.Terminator) *appsv1.Deployment {
 			},
 		},
 	}
-	addOwnerRefToObject(dep, asOwner(term))
-	err := sdk.Create(dep)
-
-	podNames := getPodList(selectors, term.Namespace)
-	if !reflect.DeepEqual(podNames, term.Status.RabbitmqNode) {
-		term.Status.RabbitmqNode = podNames
-	}
-	setOperatorStatus(term)
-
-	if err != nil && !errors.IsAlreadyExists(err) {
-		raven.CaptureError(err, nil)
-		logrus.Error(err)
-	}
-
 	svc := &v1.Service{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "Service",
@@ -95,14 +107,8 @@ func deploymentForRabbit(term *v1alpha1.Terminator) *appsv1.Deployment {
 			},
 		},
 	}
-	addOwnerRefToObject(svc, asOwner(term))
-	err = sdk.Create(svc)
-	if err != nil && !errors.IsAlreadyExists(err) {
-		raven.CaptureError(err, nil)
-		logrus.Error("failed to create memcache service: %v", err)
-	}
 
-	return dep
+	return startDeployment(dep, svc, term, selectors, term.Status.RabbitmqNode)
 }
 
 // deploymentForMemcached returns a memcached Deployment object
@@ -141,20 +147,6 @@ func deploymentForMemcached(term *v1alpha1.Terminator) *appsv1.Deployment {
 			},
 		},
 	}
-	addOwnerRefToObject(dep, asOwner(term))
-	err := sdk.Create(dep)
-
-	podNames := getPodList(selectors, term.Namespace)
-	if !reflect.DeepEqual(podNames, term.Status.MemcacheNode) {
-		term.Status.MemcacheNode = podNames
-	}
-	setOperatorStatus(term)
-
-	if err != nil && !errors.IsAlreadyExists(err) {
-		raven.CaptureError(err, nil)
-		logrus.Error(err)
-	}
-
 	svc := &v1.Service{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "Service",
@@ -176,14 +168,7 @@ func deploymentForMemcached(term *v1alpha1.Terminator) *appsv1.Deployment {
 			},
 		},
 	}
-	addOwnerRefToObject(svc, asOwner(term))
-	err = sdk.Create(svc)
-	if err != nil && !errors.IsAlreadyExists(err) {
-		raven.CaptureError(err, nil)
-		logrus.Error("failed to create memcache service: %v", err)
-	}
-
-	return dep
+	return startDeployment(dep, svc, term, selectors, term.Status.MemcacheNode)
 }
 
 // deploymentForRedis creates a redis Deployment object
@@ -225,20 +210,6 @@ func deploymentForRedis(term *v1alpha1.Terminator) *appsv1.Deployment {
 			},
 		},
 	}
-	addOwnerRefToObject(dep, asOwner(term))
-	err := sdk.Create(dep)
-
-	podNames := getPodList(selectors, term.Namespace)
-	if !reflect.DeepEqual(podNames, term.Status.RedisNode) {
-		term.Status.RedisNode = podNames
-	}
-	setOperatorStatus(term)
-
-	if err != nil && !errors.IsAlreadyExists(err) {
-		raven.CaptureError(err, nil)
-		logrus.Info(err)
-	}
-
 	svc := &v1.Service{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "Service",
@@ -260,14 +231,76 @@ func deploymentForRedis(term *v1alpha1.Terminator) *appsv1.Deployment {
 			},
 		},
 	}
-	addOwnerRefToObject(svc, asOwner(term))
-	err = sdk.Create(svc)
-	if err != nil && !errors.IsAlreadyExists(err) {
-		raven.CaptureError(err, nil)
-		logrus.Error("failed to create redis service: %v", err)
-	}
+	return startDeployment(dep, svc, term, selectors, term.Status.RedisNode)
+}
 
-	return dep
+// deploaymentForElastic a memcached Deployment object
+func deploymentForElastic(term *v1alpha1.Terminator) *appsv1.Deployment {
+	name := fmt.Sprintf("%s-%s", term.Name, "elastic")
+	selectors := labelsFor(term.Name, "elastic")
+
+	dep := &appsv1.Deployment{
+		TypeMeta: metav1.TypeMeta{
+			APIVersion: "apps/v1",
+			Kind:       "Deployment",
+		},
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      name,
+			Namespace: term.Namespace,
+		},
+		Spec: appsv1.DeploymentSpec{
+			Selector: &metav1.LabelSelector{
+				MatchLabels: selectors,
+			},
+			Template: v1.PodTemplateSpec{
+				ObjectMeta: metav1.ObjectMeta{
+					Labels: selectors,
+				},
+				Spec: v1.PodSpec{
+					Containers: []v1.Container{{
+						Image: "elasticsearch:6.4.2",
+						Name:  "elastic",
+						Ports: []v1.ContainerPort{{
+							ContainerPort: 9200,
+							Name:          "elastic",
+						}},
+						Env: []v1.EnvVar{{
+							Name:  "cluster.name",
+							Value: "kube - cluter",
+						}, {
+							Name:  "bootstrap.memory_lock",
+							Value: "true",
+						}, {
+							Name:  "ES_JAVA_OPTS",
+							Value: "-Xms512m -Xmx512m",
+						}},
+					}},
+				},
+			},
+		},
+	}
+	svc := &v1.Service{
+		TypeMeta: metav1.TypeMeta{
+			Kind:       "Service",
+			APIVersion: "v1",
+		},
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      name,
+			Namespace: term.GetNamespace(),
+			Labels:    selectors,
+		},
+		Spec: v1.ServiceSpec{
+			Selector: selectors,
+			Ports: []v1.ServicePort{
+				{
+					Name:     "elastic",
+					Protocol: v1.ProtocolTCP,
+					Port:     9200,
+				},
+			},
+		},
+	}
+	return startDeployment(dep, svc, term, selectors, term.Status.ElasticNode)
 }
 
 func setReplica(obj *appsv1.Deployment, replicas int32) error {

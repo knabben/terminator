@@ -45,6 +45,7 @@ local-ops-build:
 
 local-ops-run:
 	@make local-ops-build
+	@make ops-deploy
 	cd term-operator && TELEMETRY_HOST=localhost:8092 tmp/_output/bin/term-operator
 
 ops-deploy:

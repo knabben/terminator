@@ -25,10 +25,12 @@ type TerminatorSpec struct {
 	Memcache bool `json:"memcache"`
 	Redis    bool `json:"redis"`
 	Rabbitmq bool `json:"rabbitmq"`
+	Elastic  bool `json:"elastic"`
 }
 
 type TerminatorStatus struct {
 	MemcacheNode []string `json:"memcacheNode"`
 	RedisNode    []string `json:"redisNode"`
 	RabbitmqNode []string `json:"rabbitNode"`
+	ElasticNode  []string `json:"elasticNode"`
 }
