@@ -8,19 +8,44 @@ Kubernetes 12-factor backing services management, so far it supports:
 
 The project has 3 components, an operator, a backend and a frontend client. Telemetry is offered via Websockets for realtime monitoring.
 
-## Starting a cluster
+
+![Screenshot](https://raw.githubusercontent.com/knabben/blog/master/static/images/terminator-screen.png)
+
+## Starting a Kubernetes cluster
 
 Check out dev-setup/README.md
 
-## Operator
+## Running local
 
-### Running local
+The webserver is made up of 2 parts, the Django Channels backend that holds all 
+websockets request and a React/Sagas listening that parses and show up the information,
+to run the stack locally run:
+
+### Frontend server
+
+To run the frontend you need Node v10.x and yarn installed.
+```
+make local-frontend-run
+```
+
+
+### Backend server
+To run the backend server (Daphne) start with a pipenv install inside backend folder:
+
+```
+make local-backend-run
+```
+
+### Operator server
 
 To run the operator locally, make sure you have a default kubernetes configuration on your machine and run:
 
 ```
-$make ops-run
+$make local-ops-run
 ```
+
+
+## Production
 
 ### Deploy 
 
@@ -83,17 +108,6 @@ Check out https://github.com/knabben/forwarder
 $ make ops-clean
 ```
 
-## Web Server
-
-### Running local
-
-The webserver is made up of 2 parts, the Django Channels backend that holds all 
-websockets request and a React/Sagas listening that parses and show up the information,
-to run the stack locally run:
-
-```
-make web-run
-```
 
 ## Building the image
 
