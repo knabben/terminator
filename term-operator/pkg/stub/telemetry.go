@@ -2,6 +2,7 @@ package stub
 
 import (
 	"encoding/json"
+	"github.com/getsentry/raven-go"
 	"github.com/knabben/terminator/term-operator/pkg/apis/app/v1alpha1"
 	"net/url"
 	"os"
@@ -22,6 +23,7 @@ func (h *Handler) tryConnect() error {
 	conn, err := ConnectWebsocket()
 	if err != nil {
 		logrus.Warn(err)
+		raven.CaptureError(err, nil)
 		return err
 	}
 	h.conn = conn
@@ -38,6 +40,7 @@ func (h *Handler) SendWebsocketStatus(term *v1alpha1.Terminator) error {
 		err := h.conn.WriteMessage(websocket.TextMessage, data)
 		if err != nil {
 			h.tryConnect()
+			raven.CaptureError(err, nil)
 			return err
 		}
 	}

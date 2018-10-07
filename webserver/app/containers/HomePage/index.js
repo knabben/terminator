@@ -84,13 +84,10 @@ export class Item extends React.PureComponent {
         <Status> {status} </Status>
         <Pods>
         {
-          exists &&
-         <div className="button" onClick={() => this.props.onDelete(name)}>DELETE</div>
+          exists && <button className="button" onClick={() => this.props.onDelete(name)}>DELETE</button>
         }
-
         {
-          !exists &&
-        <button onClick={() => this.props.onCreate(name)}>CREATE</button>
+          !exists && <button onClick={() => this.props.onCreate(name)}>CREATE</button>
         }
         </Pods>
       </ContainerWrapper>
@@ -128,8 +125,8 @@ export class HomePage extends React.PureComponent {
         />
         <Item
           name="elastic"
-          exists={spec.rabbitmq}
-          status={status.rabbitNode}
+          exists={spec.elastic}
+          status={status.elastic}
           onDelete={this.props.onDelete}
           onCreate={this.props.onCreate}
         />

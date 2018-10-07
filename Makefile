@@ -14,6 +14,7 @@ local-frontend-run:
 	yarn --cwd webserver start
 
 frontend-push:
+	@make local-frontend-run
 	docker push knabben/web-front:latest
 
 ## Back-end targets
@@ -25,6 +26,7 @@ local-backend-run:
 	cd backend; pipenv run python manage.py runserver 0.0.0.0:8092
 
 backend-push:
+	@make local-backend-run
 	docker push knabben/web-backend:latest
 
 ## Web assets Production deploy

@@ -2,6 +2,7 @@ package terminator
 
 import (
 	"fmt"
+	"github.com/getsentry/raven-go"
 	"github.com/sirupsen/logrus"
 	"reflect"
 
@@ -69,6 +70,7 @@ func deploymentForRabbit(term *v1alpha1.Terminator) *appsv1.Deployment {
 	setOperatorStatus(term)
 
 	if err != nil && !errors.IsAlreadyExists(err) {
+		raven.CaptureError(err, nil)
 		logrus.Error(err)
 	}
 
@@ -96,6 +98,7 @@ func deploymentForRabbit(term *v1alpha1.Terminator) *appsv1.Deployment {
 	addOwnerRefToObject(svc, asOwner(term))
 	err = sdk.Create(svc)
 	if err != nil && !errors.IsAlreadyExists(err) {
+		raven.CaptureError(err, nil)
 		logrus.Error("failed to create memcache service: %v", err)
 	}
 
@@ -148,6 +151,7 @@ func deploymentForMemcached(term *v1alpha1.Terminator) *appsv1.Deployment {
 	setOperatorStatus(term)
 
 	if err != nil && !errors.IsAlreadyExists(err) {
+		raven.CaptureError(err, nil)
 		logrus.Error(err)
 	}
 
@@ -175,6 +179,7 @@ func deploymentForMemcached(term *v1alpha1.Terminator) *appsv1.Deployment {
 	addOwnerRefToObject(svc, asOwner(term))
 	err = sdk.Create(svc)
 	if err != nil && !errors.IsAlreadyExists(err) {
+		raven.CaptureError(err, nil)
 		logrus.Error("failed to create memcache service: %v", err)
 	}
 
@@ -230,6 +235,7 @@ func deploymentForRedis(term *v1alpha1.Terminator) *appsv1.Deployment {
 	setOperatorStatus(term)
 
 	if err != nil && !errors.IsAlreadyExists(err) {
+		raven.CaptureError(err, nil)
 		logrus.Info(err)
 	}
 
@@ -257,6 +263,7 @@ func deploymentForRedis(term *v1alpha1.Terminator) *appsv1.Deployment {
 	addOwnerRefToObject(svc, asOwner(term))
 	err = sdk.Create(svc)
 	if err != nil && !errors.IsAlreadyExists(err) {
+		raven.CaptureError(err, nil)
 		logrus.Error("failed to create redis service: %v", err)
 	}
 
@@ -273,6 +280,7 @@ func setReplica(obj *appsv1.Deployment, replicas int32) error {
 		obj.Spec.Replicas = &replicas
 		err = sdk.Update(obj)
 		if err != nil {
+			raven.CaptureError(err, nil)
 			return err
 		}
 		logrus.Warn("Setting replica to: ", replicas)
@@ -284,6 +292,7 @@ func setOperatorStatus(term *v1alpha1.Terminator) error {
 	err := sdk.Update(term)
 	if err != nil {
 		logrus.Errorf("failed to update memcached status: %v", err)
+		raven.CaptureError(err, nil)
 		return err
 
 	}
