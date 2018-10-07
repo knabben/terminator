@@ -4,39 +4,53 @@ export PATH := ${PATH}:${PWD}/webserver/node_modules/.bin
 export KUBERNETES_CONFIG := ${HOME}/.kube/config
 export WATCH_NAMESPACE := default
 
-web-run:
-	yarn --cwd webserver start &
-	python webserver/manage.py runserver 0.0.0.0:8092
 
-web-build:
-	cd webserver && \
-	docker build -f Dockerfile.dj -t web-ops:latest . && \
-	docker build -f Dockerfile.fr -t web-front:latest . && \
-	docker tag web-ops:latest knabben/web-ops:latest && \
+## Front-end targets
+frontend-build:
+	docker build -f ../docker/Dockerfile.frontend -t web-front:latest . && \
 	docker tag web-front:latest knabben/web-front:latest
 
-web-push:
-	docker push knabben/web-ops:latest
+local-frontend-run:
+	yarn --cwd webserver start
+
+frontend-push:
 	docker push knabben/web-front:latest
 
+## Back-end targets
+backend-build:
+	cd backend && docker build -f ../docker/Dockerfile.backend -t web-backend:latest . && \
+	docker tag web-backend:latest knabben/web-backend:latest
+
+local-backend-run:
+	cd backend; pipenv run python manage.py runserver 0.0.0.0:8092
+
+backend-push:
+	docker push knabben/web-backend:latest
+
+## Web assets Production deploy
 web-deploy:
-	kubectl create -f webserver/deploy/webserver.yaml
+	kubectl create -f k8s/deploy/webserver.yaml
 
 web-clean:
-	kubectl delete -f webserver/deploy/webserver.yaml
+	kubectl delete -f k8s/deploy/webserver.yaml
 
-generate:
+## Operator targets
+local-ops-generate:
 	cd term-operator && operator-sdk generate k8s
 
-build:
-	cd term-operator && operator-sdk build knabben/ops
+local-ops-build:
+	cd term-operator && GOOS=darwin GOARCH=amd64 operator-sdk build knabben/ops
+
+local-ops-run:
+	@make local-ops-build
+	cd term-operator && TELEMETRY_HOST=localhost:8092 tmp/_output/bin/term-operator
 
 ops-deploy:
 	kubectl apply -f term-operator/deploy/rbac.yaml && \
 	kubectl apply -f term-operator/deploy/crd.yaml
 
 ops-deploy-op:
-	@make build
+	@make local-ops-build
 	kubectl apply -f term-operator/deploy/operator.yaml
 
 ops-push:
@@ -49,6 +63,3 @@ ops-clean:
 	kubectl delete -f deploy/crd.yaml && \
 	kubectl delete -f deploy/operator.yaml
 
-ops-run:
-	@make build
-	cd term-operator && tmp/_output/bin/term-operator

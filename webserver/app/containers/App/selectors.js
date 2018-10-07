@@ -1,44 +1,8 @@
 import { createSelector } from 'reselect';
 
-const selectGlobal = (state) => state.get('global');
-const selectRoute = (state) => state.get('route');
+const selectRoute = state => state.get('route');
 
-const makeSelectCurrentUser = () => createSelector(
-  selectGlobal,
-  (globalState) => globalState.get('currentUser')
-);
+const makeSelectLocation = () =>
+  createSelector(selectRoute, routeState => routeState.get('location').toJS());
 
-const makeSelectLoading = () => createSelector(
-  selectGlobal,
-  (globalState) => globalState.get('loading')
-);
-
-const makeSelectError = () => createSelector(
-  selectGlobal,
-  (globalState) => globalState.get('error')
-);
-
-const makeSelectRepos = () => createSelector(
-  selectGlobal,
-  (globalState) => globalState.getIn(['userData', 'repositories'])
-);
-
-const makeSelectVersion = () => createSelector(
-  selectGlobal,
-  (globalState) => globalState.getIn(['kind', 'apiVersion'])
-);
-
-const makeSelectLocation = () => createSelector(
-  selectRoute,
-  (routeState) => routeState.get('location').toJS()
-);
-
-export {
-  selectGlobal,
-  makeSelectCurrentUser,
-  makeSelectLoading,
-  makeSelectError,
-  makeSelectRepos,
-  makeSelectVersion,
-  makeSelectLocation,
-};
+export { makeSelectLocation };

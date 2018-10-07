@@ -1,45 +1,47 @@
 import { take, all } from 'redux-saga/effects';
 import { call, put, select, takeLatest } from 'redux-saga/effects';
-import { DELETE_CRD } from './constants'
+import { DELETE_CRD } from './constants';
 
 import { sendTerminatorPayload } from './actions';
 
-import { eventChannel } from 'redux-saga'
+import { eventChannel } from 'redux-saga';
 import request from 'utils/request';
 
-const wsUrl = "ws://localhost:8092/ws/events/"
+const wsUrl = "ws://localhost:8092/ws/events/";
 
 function* createSocketChannel(ws) {
   return eventChannel(emitter => {
     ws.onopen = () => {
-      console.log('opening websocket conn...')
-    }
+      console.log('Connected on websocket.');
+    };
 
     ws.onerror = (error) => {
-      console.log('websocket error ' + error)
-      console.dir(error)
-    }
+      console.log('websocket error ' + error);
+      console.dir(error);
+    };
 
     ws.onmessage = (e) => {
-      console.log(e)
+      console.log(e);
       try {
-        const payload = JSON.parse(e.data).message
-        emitter(JSON.parse(payload))
+        const payload = JSON.parse(e.data).message;
+        emitter(JSON.parse(payload));
       } catch(err) {
-        console.error(err)
+        console.error(err);
       }
-    }
+    };
 
-    const unsubscribe = () => {console.log('socket off')}
-    return unsubscribe
-  })
+    const unsubscribe = () => {
+      console.log('socket off');
+    };
+    return unsubscribe;
+  });
 }
 
 export default function* wsSagas() {
-  const ws = new WebSocket(wsUrl)
-  const socket = yield call(createSocketChannel, ws)
+  const ws = new WebSocket(wsUrl);
+  const socket = yield call(createSocketChannel, ws);
   while (true) {
-    const payload = yield take(socket)
-    yield put(sendTerminatorPayload(payload))
+    const payload = yield take(socket);
+    yield put(sendTerminatorPayload(payload));
   }
 }

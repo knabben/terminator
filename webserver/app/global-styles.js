@@ -10,7 +10,6 @@ injectGlobal`
 
   body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    color: #f0f0f0;
   }
 
   body.fontLoaded {
@@ -18,7 +17,7 @@ injectGlobal`
   }
 
   #app {
-    background-color: #000;
+    background-color: #fafafa;
     min-height: 100%;
     min-width: 100%;
   }
@@ -26,6 +25,6 @@ injectGlobal`
   p,
   label {
     font-family: Georgia, Times, 'Times New Roman', serif;
-    line-height: 1.3em;
+    line-height: 1.5em;
   }
 `;

@@ -2,6 +2,7 @@ import {
   TERMINATOR_PAYLOAD,
   DELETE_CRD
 } from './constants';
+
 import request from 'utils/request';
 
 
@@ -14,10 +15,10 @@ export function sendDeleteCRD(name) {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({name: name})
-    }
-    const response = request(requestURL, options)
+    };
+    const response = request(requestURL, options);
   } catch (err) {
-    console.error(err)
+    console.error(err);
   }
 }
 
@@ -30,16 +31,16 @@ export function sendCreateCRD(name) {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({name: name})
-    }
-    const response = request(requestURL, options)
+    };
+    const response = request(requestURL, options);
   } catch (err) {
-    console.error(err)
+    console.error(err);
   }
 }
+
 export function sendTerminatorPayload(payload) {
   return {
-    type: TERMINATOR_PAYLOAD,
-    payload,
+    type: TERMINATOR_PAYLOAD, payload
   };
 }
 
