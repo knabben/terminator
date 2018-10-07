@@ -105,6 +105,11 @@ func (in *TerminatorStatus) DeepCopyInto(out *TerminatorStatus) {
 		*out = make([]string, len(*in))
 		copy(*out, *in)
 	}
+	if in.ElasticNode != nil {
+		in, out := &in.ElasticNode, &out.ElasticNode
+		*out = make([]string, len(*in))
+		copy(*out, *in)
+	}
 	return
 }
 
