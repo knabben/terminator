@@ -3,8 +3,8 @@ package terminator
 import (
 	"fmt"
 	"github.com/getsentry/raven-go"
+	"github.com/oleiade/reflections"
 	"github.com/sirupsen/logrus"
-	//"reflect"
 	"strconv"
 
 	"github.com/knabben/terminator/term-operator/pkg/apis/app/v1alpha1"
@@ -88,26 +88,28 @@ func startDeployment(term *v1alpha1.Terminator, extra map[string]string, envVar 
 	err = sdk.Create(svc)
 	if err != nil && !errors.IsAlreadyExists(err) {
 		raven.CaptureError(err, nil)
-		logrus.Error("failed to create memcache service: %v", err)
+		logrus.Error("failed to create service: %v", err)
 	}
 
 	// Set status on Terminator structure
-	// podNames := getPodList(selectors, term.Namespace)
-	// if !reflect.DeepEqual(podNames, term.Status.ElasticNode) {
-	// 	term.Status.ElasticNode = podNames
-	// }
-	// setOperatorStatus(term)
+	podNames := getPodList(selectors, term.Namespace)
+	err = reflections.SetField(&term.Status, extra["status"], podNames)
+	if err != nil {
+		raven.CaptureError(err, nil)
+		logrus.Error("Failed to set node status: %v", err)
+	}
+	setOperatorStatus(term)
 
 	return dep
 }
 
 // deploymentForRabbitmq returns a memcached Deployment object
 func deploymentForRabbit(term *v1alpha1.Terminator) *appsv1.Deployment {
-
 	extra := map[string]string{
-		"image": "bitnami/rabbitmq:3.7",
-		"name":  "rabbitmq",
-		"port":  "5672",
+		"image":  "bitnami/rabbitmq:3.7",
+		"name":   "rabbitmq",
+		"port":   "5672",
+		"status": "RabbitmqNode",
 	}
 
 	envVars := []v1.EnvVar{{

@@ -244,6 +244,14 @@
   version = "1.0.0"
 
 [[projects]]
+  digest = "1:a1704342ebd73b0f5cf08dac9fff5a98ce3975c65e0f8bff95ff5e83da1e352d"
+  name = "github.com/oleiade/reflections"
+  packages = ["."]
+  pruneopts = ""
+  revision = "2b6ec3da648e3e834dc41bad8d9ed7f2dc6a9496"
+  version = "v1.0.0"
+
+[[projects]]
   branch = "master"
   digest = "1:660a16282a74d798df38a8e558d2cf3eb1f7ddf4ccdc699ed0ba699f240eb9ec"
   name = "github.com/operator-framework/operator-sdk"
@@ -528,6 +536,7 @@
   input-imports = [
     "github.com/getsentry/raven-go",
     "github.com/gorilla/websocket",
+    "github.com/oleiade/reflections",
     "github.com/operator-framework/operator-sdk/pkg/sdk",
     "github.com/operator-framework/operator-sdk/pkg/util/k8sutil",
     "github.com/operator-framework/operator-sdk/version",

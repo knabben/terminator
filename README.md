@@ -41,7 +41,7 @@ make local-backend-run
 To run the operator locally, make sure you have a default kubernetes configuration on your machine and run. This will bring up all the Kubernetes assets (including the inicial CustomResource config) for default testing
 
 ```
-$make local-ops-run
+make local-ops-run
 
 role "term-operator" unchanged
 rolebinding "default-account-term-operator" unchanged
