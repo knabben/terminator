@@ -38,10 +38,15 @@ make local-backend-run
 
 ### Operator server
 
-To run the operator locally, make sure you have a default kubernetes configuration on your machine and run:
+To run the operator locally, make sure you have a default kubernetes configuration on your machine and run. This will bring up all the Kubernetes assets (including the inicial CustomResource config) for default testing
 
 ```
 $make local-ops-run
+
+role "term-operator" unchanged
+rolebinding "default-account-term-operator" unchanged
+customresourcedefinition "terminators.app.terminator.dev" configured
+kubectl apply -f term-operator/deploy/cr.yaml
 ```
 
 

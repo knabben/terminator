@@ -24,6 +24,7 @@ type Handler struct {
 	conn *websocket.Conn
 }
 
+// Handle starts the websocket
 func (h *Handler) Handle(ctx context.Context, event sdk.Event) error {
 	switch o := event.Object.(type) {
 	case *v1alpha1.Terminator:

@@ -46,6 +46,7 @@ local-ops-build:
 local-ops-run:
 	@make local-ops-build
 	@make ops-deploy
+	kubectl apply -f term-operator/deploy/cr.yaml
 	cd term-operator && TELEMETRY_HOST=localhost:8092 tmp/_output/bin/term-operator
 
 ops-deploy:

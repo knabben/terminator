@@ -126,7 +126,7 @@ export class HomePage extends React.PureComponent {
         <Item
           name="elastic"
           exists={spec.elastic}
-          status={status.elastic}
+          status={status.elasticNode}
           onDelete={this.props.onDelete}
           onCreate={this.props.onCreate}
         />

@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"github.com/getsentry/raven-go"
 	"github.com/sirupsen/logrus"
-	"reflect"
+	//"reflect"
+	"strconv"
 
 	"github.com/knabben/terminator/term-operator/pkg/apis/app/v1alpha1"
 	"github.com/operator-framework/operator-sdk/pkg/sdk"
@@ -15,21 +16,74 @@ import (
 	"k8s.io/apimachinery/pkg/api/errors"
 )
 
-func startDeployment(dep *appsv1.Deployment, svc *v1.Service, term *v1alpha1.Terminator, selector map[string]string, node []string) *appsv1.Deployment {
-	addOwnerRefToObject(dep, asOwner(term))
-	err := sdk.Create(dep)
+func startDeployment(term *v1alpha1.Terminator, extra map[string]string, envVar []v1.EnvVar) *appsv1.Deployment {
+	slug := extra["name"]
+	port, err := strconv.ParseInt(extra["port"], 10, 32)
 
-	podNames := getPodList(selector, term.Namespace)
-	if !reflect.DeepEqual(podNames, node) {
-		node = podNames
+	name := fmt.Sprintf("%s-%s", term.Name, slug)
+	selectors := labelsFor(term.Name, slug)
+
+	// Create a new deployment
+	dep := &appsv1.Deployment{
+		TypeMeta: metav1.TypeMeta{
+			APIVersion: "apps/v1",
+			Kind:       "Deployment",
+		},
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      name,
+			Namespace: term.Namespace,
+		},
+		Spec: appsv1.DeploymentSpec{
+			Selector: &metav1.LabelSelector{
+				MatchLabels: selectors,
+			},
+			Template: v1.PodTemplateSpec{
+				ObjectMeta: metav1.ObjectMeta{
+					Labels: selectors,
+				},
+				Spec: v1.PodSpec{
+					Containers: []v1.Container{{
+						Image: extra["image"],
+						Name:  slug,
+						Env:   envVar,
+						Ports: []v1.ContainerPort{{
+							ContainerPort: int32(port),
+							Name:          extra["name"],
+						}},
+					}},
+				},
+			},
+		},
 	}
-	setOperatorStatus(term)
-
+	addOwnerRefToObject(dep, asOwner(term))
+	err = sdk.Create(dep)
 	if err != nil && !errors.IsAlreadyExists(err) {
 		raven.CaptureError(err, nil)
 		logrus.Error(err)
 	}
 
+	// Create a new service
+	svc := &v1.Service{
+		TypeMeta: metav1.TypeMeta{
+			Kind:       "Service",
+			APIVersion: "v1",
+		},
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      name,
+			Namespace: term.GetNamespace(),
+			Labels:    selectors,
+		},
+		Spec: v1.ServiceSpec{
+			Selector: selectors,
+			Ports: []v1.ServicePort{
+				{
+					Name:     extra["name"],
+					Port:     int32(port),
+					Protocol: v1.ProtocolTCP,
+				},
+			},
+		},
+	}
 	addOwnerRefToObject(svc, asOwner(term))
 	err = sdk.Create(svc)
 	if err != nil && !errors.IsAlreadyExists(err) {
@@ -37,270 +91,73 @@ func startDeployment(dep *appsv1.Deployment, svc *v1.Service, term *v1alpha1.Ter
 		logrus.Error("failed to create memcache service: %v", err)
 	}
 
-	return dep
+	// Set status on Terminator structure
+	// podNames := getPodList(selectors, term.Namespace)
+	// if !reflect.DeepEqual(podNames, term.Status.ElasticNode) {
+	// 	term.Status.ElasticNode = podNames
+	// }
+	// setOperatorStatus(term)
 
+	return dep
 }
 
 // deploymentForRabbitmq returns a memcached Deployment object
 func deploymentForRabbit(term *v1alpha1.Terminator) *appsv1.Deployment {
-	name := fmt.Sprintf("%s-%s", term.Name, "rabbitmq")
-	selectors := labelsFor(term.Name, "rabbitmq")
 
-	dep := &appsv1.Deployment{
-		TypeMeta: metav1.TypeMeta{
-			APIVersion: "apps/v1",
-			Kind:       "Deployment",
-		},
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      name,
-			Namespace: term.Namespace,
-		},
-		Spec: appsv1.DeploymentSpec{
-			Selector: &metav1.LabelSelector{
-				MatchLabels: selectors,
-			},
-			Template: v1.PodTemplateSpec{
-				ObjectMeta: metav1.ObjectMeta{
-					Labels: selectors,
-				},
-				Spec: v1.PodSpec{
-					Containers: []v1.Container{{
-						Image: "bitnami/rabbitmq:3.7",
-						Name:  "rabbitmq",
-						Ports: []v1.ContainerPort{{
-							ContainerPort: 5672,
-							Name:          "rabbitmq",
-						}},
-						Env: []v1.EnvVar{
-							{
-								Name:  "RABBITMQ_USERNAME",
-								Value: "guest",
-							},
-							{
-								Name:  "RABBITMQ_PASSWORD",
-								Value: "guest",
-							},
-						},
-					}},
-				},
-			},
-		},
-	}
-	svc := &v1.Service{
-		TypeMeta: metav1.TypeMeta{
-			Kind:       "Service",
-			APIVersion: "v1",
-		},
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      name,
-			Namespace: term.GetNamespace(),
-			Labels:    selectors,
-		},
-		Spec: v1.ServiceSpec{
-			Selector: selectors,
-			Ports: []v1.ServicePort{
-				{
-					Name:     "rabbitmq",
-					Protocol: v1.ProtocolTCP,
-					Port:     5672,
-				},
-			},
-		},
+	extra := map[string]string{
+		"image": "bitnami/rabbitmq:3.7",
+		"name":  "rabbitmq",
+		"port":  "5672",
 	}
 
-	return startDeployment(dep, svc, term, selectors, term.Status.RabbitmqNode)
+	envVars := []v1.EnvVar{{
+		Name:  "RABBITMQ_USERNAME",
+		Value: "guest",
+	}, {
+		Name:  "RABBITMQ_PASSWORD",
+		Value: "guest",
+	}}
+	return startDeployment(term, extra, envVars)
 }
 
 // deploymentForMemcached returns a memcached Deployment object
 func deploymentForMemcached(term *v1alpha1.Terminator) *appsv1.Deployment {
-	name := fmt.Sprintf("%s-%s", term.Name, "memcache")
-	selectors := labelsFor(term.Name, "memcache")
+	//Command: []string{"memcached", "-o", "modern", "-v"},
 
-	dep := &appsv1.Deployment{
-		TypeMeta: metav1.TypeMeta{
-			APIVersion: "apps/v1",
-			Kind:       "Deployment",
-		},
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      name,
-			Namespace: term.Namespace,
-		},
-		Spec: appsv1.DeploymentSpec{
-			Selector: &metav1.LabelSelector{
-				MatchLabels: selectors,
-			},
-			Template: v1.PodTemplateSpec{
-				ObjectMeta: metav1.ObjectMeta{
-					Labels: selectors,
-				},
-				Spec: v1.PodSpec{
-					Containers: []v1.Container{{
-						Image:   "memcached:1.5.6-alpine",
-						Name:    "memcached",
-						Command: []string{"memcached", "-o", "modern", "-v"},
-						Ports: []v1.ContainerPort{{
-							ContainerPort: 11211,
-							Name:          "memcached",
-						}},
-					}},
-				},
-			},
-		},
+	extra := map[string]string{
+		"image":  "memcached:1.5.6-alpine",
+		"name":   "memcached",
+		"port":   "11211",
+		"status": "MemcacheNode",
 	}
-	svc := &v1.Service{
-		TypeMeta: metav1.TypeMeta{
-			Kind:       "Service",
-			APIVersion: "v1",
-		},
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      name,
-			Namespace: term.GetNamespace(),
-			Labels:    selectors,
-		},
-		Spec: v1.ServiceSpec{
-			Selector: selectors,
-			Ports: []v1.ServicePort{
-				{
-					Name:     "memcache",
-					Protocol: v1.ProtocolTCP,
-					Port:     11211,
-				},
-			},
-		},
-	}
-	return startDeployment(dep, svc, term, selectors, term.Status.MemcacheNode)
+	return startDeployment(term, extra, []v1.EnvVar{})
 }
 
 // deploymentForRedis creates a redis Deployment object
 func deploymentForRedis(term *v1alpha1.Terminator) *appsv1.Deployment {
-	name := fmt.Sprintf("%s-%s", term.Name, "redis")
-	selectors := labelsFor(term.Name, "redis")
+	extra := map[string]string{
+		"image":  "bitnami/redis:4.0.10",
+		"name":   "redis",
+		"port":   "6379",
+		"status": "RedisNode",
+	}
+	envVars := []v1.EnvVar{{
+		Name:  "ALLOW_EMPTY_PASSWORD",
+		Value: "yes",
+	}}
 
-	dep := &appsv1.Deployment{
-		TypeMeta: metav1.TypeMeta{
-			APIVersion: "apps/v1",
-			Kind:       "Deployment",
-		},
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      name,
-			Namespace: term.Namespace,
-		},
-		Spec: appsv1.DeploymentSpec{
-			Selector: &metav1.LabelSelector{
-				MatchLabels: selectors,
-			},
-			Template: v1.PodTemplateSpec{
-				ObjectMeta: metav1.ObjectMeta{
-					Labels: selectors,
-				},
-				Spec: v1.PodSpec{
-					Containers: []v1.Container{{
-						Image: "bitnami/redis:4.0.10",
-						Name:  "redis",
-						Env: []v1.EnvVar{{
-							Name:  "ALLOW_EMPTY_PASSWORD",
-							Value: "yes",
-						}},
-						Ports: []v1.ContainerPort{{
-							ContainerPort: 6379,
-							Name:          "redis",
-						}},
-					}},
-				},
-			},
-		},
-	}
-	svc := &v1.Service{
-		TypeMeta: metav1.TypeMeta{
-			Kind:       "Service",
-			APIVersion: "v1",
-		},
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      name,
-			Namespace: term.GetNamespace(),
-			Labels:    selectors,
-		},
-		Spec: v1.ServiceSpec{
-			Selector: selectors,
-			Ports: []v1.ServicePort{
-				{
-					Name:     "redis",
-					Protocol: v1.ProtocolTCP,
-					Port:     6379,
-				},
-			},
-		},
-	}
-	return startDeployment(dep, svc, term, selectors, term.Status.RedisNode)
+	return startDeployment(term, extra, envVars)
 }
 
-// deploaymentForElastic a memcached Deployment object
+// deploaymentForElastic a elastic Deployment object
 func deploymentForElastic(term *v1alpha1.Terminator) *appsv1.Deployment {
-	name := fmt.Sprintf("%s-%s", term.Name, "elastic")
-	selectors := labelsFor(term.Name, "elastic")
-
-	dep := &appsv1.Deployment{
-		TypeMeta: metav1.TypeMeta{
-			APIVersion: "apps/v1",
-			Kind:       "Deployment",
-		},
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      name,
-			Namespace: term.Namespace,
-		},
-		Spec: appsv1.DeploymentSpec{
-			Selector: &metav1.LabelSelector{
-				MatchLabels: selectors,
-			},
-			Template: v1.PodTemplateSpec{
-				ObjectMeta: metav1.ObjectMeta{
-					Labels: selectors,
-				},
-				Spec: v1.PodSpec{
-					Containers: []v1.Container{{
-						Image: "elasticsearch:6.4.2",
-						Name:  "elastic",
-						Ports: []v1.ContainerPort{{
-							ContainerPort: 9200,
-							Name:          "elastic",
-						}},
-						Env: []v1.EnvVar{{
-							Name:  "cluster.name",
-							Value: "kube - cluter",
-						}, {
-							Name:  "bootstrap.memory_lock",
-							Value: "true",
-						}, {
-							Name:  "ES_JAVA_OPTS",
-							Value: "-Xms512m -Xmx512m",
-						}},
-					}},
-				},
-			},
-		},
+	extra := map[string]string{
+		"image":  "elasticsearch:6.4.0",
+		"name":   "elastic",
+		"port":   "9200",
+		"status": "ElasticNode",
 	}
-	svc := &v1.Service{
-		TypeMeta: metav1.TypeMeta{
-			Kind:       "Service",
-			APIVersion: "v1",
-		},
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      name,
-			Namespace: term.GetNamespace(),
-			Labels:    selectors,
-		},
-		Spec: v1.ServiceSpec{
-			Selector: selectors,
-			Ports: []v1.ServicePort{
-				{
-					Name:     "elastic",
-					Protocol: v1.ProtocolTCP,
-					Port:     9200,
-				},
-			},
-		},
-	}
-	return startDeployment(dep, svc, term, selectors, term.Status.ElasticNode)
+	return startDeployment(term, extra, []v1.EnvVar{})
 }
 
 func setReplica(obj *appsv1.Deployment, replicas int32) error {
@@ -324,8 +181,8 @@ func setReplica(obj *appsv1.Deployment, replicas int32) error {
 func setOperatorStatus(term *v1alpha1.Terminator) error {
 	err := sdk.Update(term)
 	if err != nil {
-		logrus.Errorf("failed to update memcached status: %v", err)
 		raven.CaptureError(err, nil)
+		logrus.Errorf("failed to update status: %v", err)
 		return err
 
 	}
