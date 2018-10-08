@@ -7,27 +7,27 @@ export WATCH_NAMESPACE := default
 
 ## Front-end targets
 frontend-build:
-	docker build -f ../docker/Dockerfile.frontend -t web-front:latest . && \
+	docker build -f docker/Dockerfile.frontend -t web-front:latest webserver/ && \
 	docker tag web-front:latest knabben/web-front:latest
-
-local-frontend-run:
-	yarn --cwd webserver start
 
 frontend-push:
 	@make local-frontend-run
 	docker push knabben/web-front:latest
 
+local-frontend-run:
+	yarn --cwd webserver start
+
 ## Back-end targets
 backend-build:
-	cd backend && docker build -f ../docker/Dockerfile.backend -t web-backend:latest . && \
+	docker build -f docker/Dockerfile.backend -t web-backend:latest backend && \
 	docker tag web-backend:latest knabben/web-backend:latest
-
-local-backend-run:
-	cd backend; pipenv run python manage.py runserver 0.0.0.0:8092
 
 backend-push:
 	@make local-backend-run
 	docker push knabben/web-backend:latest
+
+local-backend-run:
+	cd backend; pipenv run python manage.py runserver 0.0.0.0:8092
 
 ## Web assets Production deploy
 web-deploy:

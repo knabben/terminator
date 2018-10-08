@@ -52,6 +52,15 @@ kubectl apply -f term-operator/deploy/cr.yaml
 
 ## Production
 
+### Building the image
+
+First is necessary to build the docker image for all projects, for this run:
+
+```
+$ make backend-build
+$ make frontend-build
+````
+
 ### Deploy 
 
 Deploy it to a real cluster:
@@ -111,30 +120,6 @@ Check out https://github.com/knabben/forwarder
 
 ```
 $ make ops-clean
-```
-
-
-## Building the image
-
-```
-$ make web-build
-$ make web-push
-````
-
-### Deploy it
-
-Deploy on production, it will create 3 containers inside the web-ops, daphne, django and frontend:
-
-```
-$ make web-deploy
-```
-
-### Clean
-
-To remove the Pod from cluster, just use:
-
-```
-$ make web-clean
 ```
 
 ### Accessing the dashboard
