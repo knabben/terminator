@@ -1,4 +1,5 @@
 FROM node:9.11.2-slim
+ENV PORT 8090
 
 RUN apt-get update && apt-get -y install libpng-dev
 
@@ -12,5 +13,6 @@ COPY package.json .
 RUN yarn install
 
 COPY app app/
+RUN yarn build
 
-CMD ["yarn", "run", "start:production"]
+CMD ["yarn", "run", "start:prod"]

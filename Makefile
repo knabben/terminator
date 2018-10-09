@@ -31,10 +31,10 @@ local-backend-run:
 
 ## Web assets Production deploy
 web-deploy:
-	kubectl create -f k8s/deploy/webserver.yaml
+	kubectl create -f k8s/web-deploy.yaml
 
 web-clean:
-	kubectl delete -f k8s/deploy/webserver.yaml
+	kubectl delete -f k8s/web-deploy.yaml
 
 ## Operator targets
 local-ops-generate:
@@ -49,16 +49,19 @@ local-ops-run:
 	kubectl apply -f term-operator/deploy/cr.yaml
 	cd term-operator && TELEMETRY_HOST=localhost:8092 tmp/_output/bin/term-operator
 
+ops-build:
+	cd term-operator && GOOS=linux GOARCH=amd64 operator-sdk build knabben/ops
+
+ops-push:
+	docker push knabben/ops:latest
+
 ops-deploy:
 	kubectl apply -f term-operator/deploy/rbac.yaml && \
 	kubectl apply -f term-operator/deploy/crd.yaml
 
 ops-deploy-op:
-	@make local-ops-build
+	@make ops-build
 	kubectl apply -f term-operator/deploy/operator.yaml
-
-ops-push:
-	docker push knabben/ops:latest
 
 ops-clean:
 	rm term-operator/tmp/_output/bin/term-operator && \
@@ -66,4 +69,3 @@ ops-clean:
 	kubectl delete -f deploy/rbac.yaml && \
 	kubectl delete -f deploy/crd.yaml && \
 	kubectl delete -f deploy/operator.yaml
-

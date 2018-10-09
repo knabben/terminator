@@ -49,7 +49,6 @@ customresourcedefinition "terminators.app.terminator.dev" configured
 kubectl apply -f term-operator/deploy/cr.yaml
 ```
 
-
 ## Production
 
 ### Building the image
@@ -57,17 +56,25 @@ kubectl apply -f term-operator/deploy/cr.yaml
 First is necessary to build the docker image for all projects, for this run:
 
 ```
+$ make ops-build
+$ make ops-push
+
 $ make backend-build
+$ make backend-push
+
 $ make frontend-build
-````
+$ make frontend-push
+```
 
 ### Deploy 
 
-Deploy it to a real cluster:
+Deploy the frontend to the cluster:
 
 ```
-$ make ops-deploy
+$ make web-deploy
 
+$ make ops-deploy
+$ make ops-deploy-op
 
 # Check if ops pod is there
 $ kubectl get pods
@@ -98,6 +105,7 @@ Basically you just need to tell the spec, which services you are going to need,
 the setting is a boolean flag.
 
 To start it use:
+
 ```
 $ kubectl create -f term-operator/deploy/cr.yaml
 
