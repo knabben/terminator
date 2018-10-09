@@ -11,7 +11,7 @@ frontend-build:
 	docker tag web-front:latest knabben/web-front:latest
 
 frontend-push:
-	@make local-frontend-run
+	@make frontend-build
 	docker push knabben/web-front:latest
 
 local-frontend-run:
@@ -23,7 +23,7 @@ backend-build:
 	docker tag web-backend:latest knabben/web-backend:latest
 
 backend-push:
-	@make local-backend-run
+	@make backend-build
 	docker push knabben/web-backend:latest
 
 local-backend-run:
