@@ -11,6 +11,37 @@ The project has 3 components, an operator, a backend and a frontend client. Tele
 
 ![Screenshot](https://raw.githubusercontent.com/knabben/blog/master/static/images/terminator-screen.png)
 
+## Fast Flight
+
+If you are eager to run the system try this:
+
+```
+$ kind create cluster
+$ export KUBECONFIG="$(kind get kubeconfig-path)"
+$ cat <<EOF | kubectl apply -f -
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: tiller
+  namespace: kube-system
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRoleBinding
+metadata:
+  name: tiller
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin
+subjects:
+  - kind: ServiceAccount
+    name: tiller
+    namespace: kube-system
+EOF
+$ helm repo add knabben https://knabben.github.io/charts/
+$ helm install --name terminator knabben/terminator
+``` 
+
 ## Starting a Kubernetes cluster
 
 Check out dev-setup/README.md
