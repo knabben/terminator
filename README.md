@@ -38,6 +38,7 @@ subjects:
     name: tiller
     namespace: kube-system
 EOF
+$ helm init --service-account tiller --upgrade
 $ helm repo add knabben https://knabben.github.io/charts/
 $ helm install --name terminator knabben/terminator
 ``` 
