@@ -62,7 +62,7 @@ Django = "==2.1.2"
 ipython_genutils = "==0.2.0"
 Pygments = "==2.2.0"
 PyYAML = "==3.12"
-Twisted = "==18.7.0"
+Twisted = "==19.7.0"
 
 [dev-packages]
 
