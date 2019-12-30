@@ -1,0 +1,7 @@
+version: "2"
+domain: bluebird.io
+repo: github.com/knabben/terminator/operator
+resources:
+- group: backing
+  version: v1
+  kind: Service

@@ -1,0 +1,7 @@
+apiVersion: backing.bluebird.io/v1
+kind: Service
+metadata:
+  name: service-sample
+spec:
+  # Add fields here
+  foo: bar
