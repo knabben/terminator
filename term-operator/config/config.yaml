@@ -1,3 +1,0 @@
-apiVersion: app.terminator.dev/v1alpha1
-kind: Terminator
-projectName: term-operator
