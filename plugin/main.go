@@ -148,20 +148,13 @@ func handlePrint(request *service.PrintRequest) (plugin.PrintResponse, error) {
 // the plugin.
 func handleNavigation(request *service.NavigationRequest) (navigation.Navigation, error) {
 	return navigation.Navigation{
-		Title: "Sample Plugin",
+		Title: "Terminator",
 		Path:  request.GeneratePath(),
 		Children: []navigation.Navigation{
 			{
-				Title:    "Nested Once",
+				Title:    "Backing services",
 				Path:     request.GeneratePath("nested-once"),
 				IconName: "folder",
-				Children: []navigation.Navigation{
-					{
-						Title:    "Nested Twice",
-						Path:     request.GeneratePath("nested-once", "nested-twice"),
-						IconName: "folder",
-					},
-				},
 			},
 		},
 		IconName: "cloud",
@@ -184,8 +177,8 @@ func initRoutes(router *service.Router) {
 
 	router.HandleFunc("*", func(request *service.Request) (component.ContentResponse, error) {
 		// For each page, generate two tabs with a some content.
-		component1 := gen("Tab 1", "tab1", request.Path)
-		component2 := gen("Tab 2", "tab2", request.Path)
+		component1 := gen("Redis", "tab1", request.Path)
+		component2 := gen("RabbitMQ", "tab2", request.Path)
 
 		contentResponse := component.NewContentResponse(component.TitleFromString("Example"))
 		contentResponse.Add(component1, component2)

@@ -1,5 +1,5 @@
 .PHONY: plugin
 
 plugin:
-	cd plugin; go build -o ~/.config/octant/plugin .
+	cd plugin; go build -o ~/.config/octant/plugins/terminator .
 
