@@ -1,2 +1,0 @@
-export const TERMINATOR_PAYLOAD = 'App/TERMINATOR_PAYLOAD';
-export const DELETE_CRD= 'App/DELETE_CRD';
