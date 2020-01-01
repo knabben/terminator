@@ -17,8 +17,10 @@ package controllers
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/go-logr/logr"
+	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
@@ -28,18 +30,39 @@ import (
 // ServiceReconciler reconciles a Service object
 type ServiceReconciler struct {
 	client.Client
-	Log logr.Logger
+	Log    logr.Logger
+	Scheme *runtime.Scheme
 }
 
 // +kubebuilder:rbac:groups=backing.bluebird.io,resources=services,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=backing.bluebird.io,resources=services/status,verbs=get;update;patch
 
 func (r *ServiceReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
-	_ = context.Background()
-	_ = r.Log.WithValues("service", req.NamespacedName)
+	ctx := context.Background()
+	log := r.Log.WithValues("service", req.NamespacedName)
+	applyOpts := []client.PatchOption{
+		client.ForceOwnership,
+		client.FieldOwner("redis-controller"),
+	}
 
-	// your logic here
+	var service backingv1.Service
+	if err := r.Get(ctx, req.NamespacedName, &service); err != nil {
+		log.Error(err, "Can't get service.backing")
+		return ctrl.Result{}, nil
+	}
 
+	depl, err := r.leaderDeployment(service)
+	if err != nil {
+		log.Error(err, "Trying to create deployment")
+		return ctrl.Result{}, nil
+	}
+
+	err = r.Patch(ctx, &depl, client.Apply, applyOpts...)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+
+	log.Info(fmt.Sprintf("reconciled %s", service.Name))
 	return ctrl.Result{}, nil
 }
 
