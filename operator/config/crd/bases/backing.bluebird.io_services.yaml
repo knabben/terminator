@@ -3,6 +3,8 @@
 apiVersion: apiextensions.k8s.io/v1beta1
 kind: CustomResourceDefinition
 metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: (devel)
   creationTimestamp: null
   name: services.backing.bluebird.io
 spec:
@@ -12,7 +14,7 @@ spec:
     listKind: ServiceList
     plural: services
     singular: service
-  scope: ""
+  scope: Namespaced
   validation:
     openAPIV3Schema:
       description: Service is the Schema for the services API
@@ -31,9 +33,21 @@ spec:
           type: object
         spec:
           description: ServiceSpec defines the desired state of Service
+          properties:
+            name:
+              type: string
+          required:
+          - name
           type: object
         status:
           description: ServiceStatus defines the observed state of Service
+          properties:
+            pods:
+              items:
+                type: string
+              type: array
+          required:
+          - pods
           type: object
       type: object
   version: v1

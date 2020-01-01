@@ -24,14 +24,12 @@ import (
 
 // ServiceSpec defines the desired state of Service
 type ServiceSpec struct {
-	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
+	Name string `json:"name"`
 }
 
 // ServiceStatus defines the observed state of Service
 type ServiceStatus struct {
-	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
+	Pod []string `json:"pods"`
 }
 
 // +kubebuilder:object:root=true
