@@ -6,12 +6,29 @@ general testing.
 
 ![Screenshot](https://raw.githubusercontent.com/knabben/terminator/master/screen/screenshot.png)
 
+## Development
+
 **NOTE:** This is a [WIP], for the older version go to https://github.com/knabben/terminator/tree/v1.5.0
 
+### Operator
 
-## Plugin
+For development enter the *operator* folder and run:
+
+```
+make run
+```
+
+### Plugin
 
 Compile the Octant plugin and install in the *~/.config/octant/plugins/*
+
 ```
 make plugin
+```
+
+Run Octant after installing the plugin: 
+  
+```
+vmware-tanzu/octant/web$ npm run start  # ui 
+vmware-tanzu/octant$ go run cmd/octant/main.go --proxy-frontend http://localhost:4200 -v=7
 ```
