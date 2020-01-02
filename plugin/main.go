@@ -52,7 +52,6 @@ func main() {
 	p.Serve()
 }
 
-
 // handleActions - set actions handler
 func handleActions(request *service.ActionRequest) error {
 	// Create a new CRD

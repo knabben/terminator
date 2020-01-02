@@ -1,8 +1,8 @@
 package main
 
 import (
-	schema "k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	schema "k8s.io/apimachinery/pkg/runtime/schema"
 )
 
 // crdBackingService returns the GVR and resources
@@ -26,5 +26,3 @@ func crdBackingService() (schema.GroupVersionResource, *unstructured.Unstructure
 	}
 	return gvr, resource
 }
-
-
