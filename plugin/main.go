@@ -6,16 +6,23 @@ SPDX-License-Identifier: Apache-2.0
 package main
 
 import (
+	"flag"
 	"fmt"
-	_ "k8s.io/apimachinery/pkg/runtime/schema"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	schema "k8s.io/apimachinery/pkg/runtime/schema"
 	"log"
+	"path/filepath"
 	"strings"
 
-	_ "github.com/knabben/terminator/plugin/api/v1"
 	"github.com/vmware-tanzu/octant/pkg/navigation"
 	"github.com/vmware-tanzu/octant/pkg/plugin"
 	"github.com/vmware-tanzu/octant/pkg/plugin/service"
 	"github.com/vmware-tanzu/octant/pkg/view/component"
+
+	"k8s.io/client-go/dynamic"
+	"k8s.io/client-go/tools/clientcmd"
+	"k8s.io/client-go/util/homedir"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 var pluginName = "bs"
@@ -42,9 +49,63 @@ func main() {
 	p.Serve()
 }
 
-// HandleActions - TODO - create a handler for the action
+// handleActions - set actions handler
 func handleActions(request *service.ActionRequest) error {
-	fmt.Println("request", request)
+	var kubeconfig *string
+
+	if home := homedir.HomeDir(); home != "" {
+		kubeconfig = flag.String("kubeconfig", filepath.Join(home, ".kube", "config"), "(optional) absolute path to the kubeconfig file")
+	} else {
+		kubeconfig = flag.String("kubeconfig", "", "absolute path to the kubeconfig file")
+	}
+	flag.Parse()
+
+	config, err := clientcmd.BuildConfigFromFlags("", *kubeconfig)
+	if err != nil {
+		panic(err)
+	}
+
+	c, err := dynamic.NewForConfig(config)
+	if err != nil {
+		log.Fatal(err)
+		return err
+	}
+
+	res := schema.GroupVersionResource{
+		Group: "backing.bluebird.io",
+		Version: "v1",
+		Resource: "services",
+	}
+
+	grvClient := c.Resource(res).Namespace("default")
+
+	list, err := grvClient.List(metav1.ListOptions{})
+	if err != nil {
+		log.Fatal(err)
+		return err
+	}
+	for _, r := range list.Items {
+		log.Printf(fmt.Sprintf("Found one. %s", r))
+	}
+
+	svc := &unstructured.Unstructured{
+		Object: map[string]interface{}{
+			"apiVersion": "backing.bluebird.io/v1",
+			"kind":       "Service",
+			"metadata": map[string]interface{}{
+				"name": "name-1",
+			},
+			"spec": map[string]interface{}{
+				"name": "redis",
+			},
+		},
+	}
+
+	if _, err := grvClient.Create(svc, metav1.CreateOptions{}); err != nil {
+		log.Fatal(err)
+		return err
+	}
+
 	log.Printf(fmt.Sprintf("%s", request.Payload))
 	return nil
 }
