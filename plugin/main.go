@@ -6,32 +6,19 @@ SPDX-License-Identifier: Apache-2.0
 package main
 
 import (
-	"flag"
 	"fmt"
 	"log"
 	"strings"
-	"path/filepath"
-
-	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
-	schema "k8s.io/apimachinery/pkg/runtime/schema"
 
 	"github.com/vmware-tanzu/octant/pkg/navigation"
 	"github.com/vmware-tanzu/octant/pkg/plugin"
 	"github.com/vmware-tanzu/octant/pkg/plugin/service"
 	"github.com/vmware-tanzu/octant/pkg/view/component"
 
-	"k8s.io/client-go/dynamic"
-	"k8s.io/client-go/rest"
-
-	"k8s.io/client-go/tools/clientcmd"
-	"k8s.io/client-go/util/homedir"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-var (
-	pluginName = "bs"
-	clientset dynamic.Interface
-)
+var pluginName = "bs"
 
 func main() {
 	log.SetPrefix("bs")
@@ -46,6 +33,16 @@ func main() {
 		service.WithActionHandler(handleActions),
 	}
 
+	config, err := SetConfiguration()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	clientset, err = Connect(config)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	p, err := service.Register(pluginName, "Backing services plugin", capabilities, options...)
 	if err != nil {
 		log.Fatal(err)
@@ -55,66 +52,13 @@ func main() {
 	p.Serve()
 }
 
-func connectViaKubeconfig() (*rest.Config, error) {
-	var kubeconfig *string
-
-	if home := homedir.HomeDir(); home != "" {
-		kubeconfig = flag.String("kubeconfig", filepath.Join(home, ".kube", "config"), "(optional) absolute path to the kubeconfig file")
-	} else {
-		kubeconfig = flag.String("kubeconfig", "", "absolute path to the kubeconfig file")
-	}
-	flag.Parse()
-
-	return clientcmd.BuildConfigFromFlags("", *kubeconfig)
-}
 
 // handleActions - set actions handler
 func handleActions(request *service.ActionRequest) error {
-	config, err := connectViaKubeconfig()
-	if err != nil {
-		log.Fatal(err)
-		return err
-	}
-
-	if clientset == nil {
-		clientset, err = dynamic.NewForConfig(config)
-		if err != nil {
-			log.Fatal(err)
-			return err
-		}
-	}
-
-	res := schema.GroupVersionResource{
-		Group: "backing.bluebird.io",
-		Version: "v1",
-		Resource: "services",
-	}
-
-	grvClient := clientset.Resource(res).Namespace("default")
-
-	list, err := grvClient.List(metav1.ListOptions{})
-	if err != nil {
-		log.Fatal(err)
-		return err
-	}
-	for _, r := range list.Items {
-		log.Printf(fmt.Sprintf("Found one. %s", r))
-	}
-
-	svc := &unstructured.Unstructured{
-		Object: map[string]interface{}{
-			"apiVersion": "backing.bluebird.io/v1",
-			"kind":       "Service",
-			"metadata": map[string]interface{}{
-				"name": "name-1",
-			},
-			"spec": map[string]interface{}{
-				"name": "redis",
-			},
-		},
-	}
-
-	if _, err := grvClient.Create(svc, metav1.CreateOptions{}); err != nil {
+	// Create a new CRD
+	gvr, resource := crdBackingService()
+	gvrClient := clientset.Resource(gvr).Namespace("default")
+	if _, err := gvrClient.Create(resource, metav1.CreateOptions{}); err != nil {
 		log.Fatal(err)
 		return err
 	}
