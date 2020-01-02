@@ -8,11 +8,12 @@ package main
 import (
 	"flag"
 	"fmt"
+	"log"
+	"strings"
+	"path/filepath"
+
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
-	"log"
-	"path/filepath"
-	"strings"
 
 	"github.com/vmware-tanzu/octant/pkg/navigation"
 	"github.com/vmware-tanzu/octant/pkg/plugin"
@@ -20,12 +21,17 @@ import (
 	"github.com/vmware-tanzu/octant/pkg/view/component"
 
 	"k8s.io/client-go/dynamic"
+	"k8s.io/client-go/rest"
+
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/util/homedir"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-var pluginName = "bs"
+var (
+	pluginName = "bs"
+	clientset dynamic.Interface
+)
 
 func main() {
 	log.SetPrefix("bs")
@@ -49,8 +55,7 @@ func main() {
 	p.Serve()
 }
 
-// handleActions - set actions handler
-func handleActions(request *service.ActionRequest) error {
+func connectViaKubeconfig() (*rest.Config, error) {
 	var kubeconfig *string
 
 	if home := homedir.HomeDir(); home != "" {
@@ -60,15 +65,23 @@ func handleActions(request *service.ActionRequest) error {
 	}
 	flag.Parse()
 
-	config, err := clientcmd.BuildConfigFromFlags("", *kubeconfig)
-	if err != nil {
-		panic(err)
-	}
+	return clientcmd.BuildConfigFromFlags("", *kubeconfig)
+}
 
-	c, err := dynamic.NewForConfig(config)
+// handleActions - set actions handler
+func handleActions(request *service.ActionRequest) error {
+	config, err := connectViaKubeconfig()
 	if err != nil {
 		log.Fatal(err)
 		return err
+	}
+
+	if clientset == nil {
+		clientset, err = dynamic.NewForConfig(config)
+		if err != nil {
+			log.Fatal(err)
+			return err
+		}
 	}
 
 	res := schema.GroupVersionResource{
@@ -77,7 +90,7 @@ func handleActions(request *service.ActionRequest) error {
 		Resource: "services",
 	}
 
-	grvClient := c.Resource(res).Namespace("default")
+	grvClient := clientset.Resource(res).Namespace("default")
 
 	list, err := grvClient.List(metav1.ListOptions{})
 	if err != nil {
