@@ -15,7 +15,10 @@ general testing.
 For development enter the *operator* folder and run:
 
 ```
-make run
+$ cd operator
+
+operator$ make install
+operator$ make run
 ```
 
 ### Plugin
