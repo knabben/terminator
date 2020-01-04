@@ -6,7 +6,25 @@ general testing.
 
 ![Screenshot](https://raw.githubusercontent.com/knabben/terminator/master/screen/screenshot.png)
 
-## Development
+
+## Install
+
+To deloy the operator in a cluster:
+
+```
+$ export IMG=knabben/operator
+
+cd operator
+operator$ make docker-build
+operator$ make docker-push
+
+# we have the operator set with the knabben/operator image
+ 
+operator$ make install
+operator$ make deploy
+```
+
+### Development
 
 **NOTE:** This is a [WIP], for the older version go to https://github.com/knabben/terminator/tree/v1.5.0
 
