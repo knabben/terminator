@@ -6,7 +6,7 @@ import (
 )
 
 // crdBackingService returns the GVR and resources
-func crdBackingService() (schema.GroupVersionResource, *unstructured.Unstructured) {
+func crdBackingService(port string) (schema.GroupVersionResource, *unstructured.Unstructured) {
 	gvr := schema.GroupVersionResource{
 		Group:    "backing.bluebird.io",
 		Version:  "v1",
@@ -21,6 +21,7 @@ func crdBackingService() (schema.GroupVersionResource, *unstructured.Unstructure
 			},
 			"spec": map[string]interface{}{
 				"name": "redis",
+				"port": port,
 			},
 		},
 	}

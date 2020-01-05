@@ -54,15 +54,16 @@ func main() {
 
 // handleActions - set actions handler
 func handleActions(request *service.ActionRequest) error {
+	log.Printf(fmt.Sprintf("-- PORT %s --", request.Payload["port"]))
+
 	// Create a new CRD
-	gvr, resource := crdBackingService()
+	gvr, resource := crdBackingService(port)
 	gvrClient := clientset.Resource(gvr).Namespace("default")
 	if _, err := gvrClient.Create(resource, metav1.CreateOptions{}); err != nil {
 		log.Fatal(err)
 		return err
 	}
 
-	log.Printf(fmt.Sprintf("%s", request.Payload))
 	return nil
 }
 
@@ -72,7 +73,6 @@ func initRoutes(router *service.Router) {
 		contentResponse := component.NewContentResponse(component.TitleFromString("Backing Services"))
 		contentResponse.Add(
 			componentGenerator("Redis", "tab1", request.Path),
-			componentGenerator("RabbitMQ", "tab2", request.Path),
 		)
 		return *contentResponse, nil
 	})
@@ -105,7 +105,7 @@ func componentGenerator(name, accessor, requestPath string) component.Component 
 		Title: "Create a new replicaset",
 		Form: component.Form{
 			Fields: []component.FormField{
-				component.NewFormFieldNumber("Replicas", "replicas", "1"),
+				component.NewFormFieldNumber("Port", "port", "6379"),
 				component.NewFormFieldHidden("action", "crds/create-new"),
 				component.NewFormFieldHidden("object", strings.ToLower(name)),
 			},
