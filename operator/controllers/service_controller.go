@@ -65,7 +65,7 @@ func (r *ServiceReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	// TODO - Service
 	// TODO - Status update
 
-	log.Info(fmt.Sprintf("reconciled %s", service.Name))
+	log.Info(fmt.Sprintf("reconciled %s on %s", service.Name, service.Spec.Port))
 	return ctrl.Result{}, nil
 }
 
