@@ -25,6 +25,7 @@ import (
 // ServiceSpec defines the desired state of Service
 type ServiceSpec struct {
 	Name string `json:"name"`
+	Port string `json:"port"`
 }
 
 // ServiceStatus defines the observed state of Service
