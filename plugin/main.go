@@ -54,10 +54,11 @@ func main() {
 
 // handleActions - set actions handler
 func handleActions(request *service.ActionRequest) error {
-	log.Printf(fmt.Sprintf("-- PORT %s --", request.Payload["port"]))
+	port := request.Payload["port"]
+	log.Printf(fmt.Sprintf("-- PORT %s --", port))
 
 	// Create a new CRD
-	gvr, resource := crdBackingService(port)
+	gvr, resource := crdBackingService(port.(string))
 	gvrClient := clientset.Resource(gvr).Namespace("default")
 	if _, err := gvrClient.Create(resource, metav1.CreateOptions{}); err != nil {
 		log.Fatal(err)
