@@ -51,10 +51,15 @@ func (r *ServiceReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 		return ctrl.Result{}, nil
 	}
 
-	depl, err := r.leaderDeployment(service)
+	depl, err := r.ServiceDeployment(service)
 	if err != nil {
 		log.Error(err, "Trying to create deployment")
 		return ctrl.Result{}, nil
+	}
+
+	svc, err := r.ServiceService(service)
+	if err != nil {
+		return ctrl.Result{}, err
 	}
 
 	err = r.Patch(ctx, &depl, client.Apply, applyOpts...)
@@ -62,8 +67,10 @@ func (r *ServiceReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 		return ctrl.Result{}, err
 	}
 
-	// TODO - Service
-	// TODO - Status update
+	err = r.Patch(ctx, &svc, client.Apply, applyOpts...)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
 
 	log.Info(fmt.Sprintf("reconciled %s on %s", service.Name, service.Spec.Port))
 	return ctrl.Result{}, nil
